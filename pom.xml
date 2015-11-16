@@ -5,6 +5,29 @@
 	<groupId>com.googlecode.selenium-uitaf</groupId>
 	<artifactId>ui_auto_core</artifactId>
 	<version>2.0.0</version>
+	<description>Selenium based UI Test Automation Framework (selenium-uitaf) is Java framework which simplifies development process for Web UI test automation scripts.</description>
+	<name>selenium-uitaf</name>
+	<url>https://github.com/braimanm/selenium-uitaf</url>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Michael Braiman</name>
+			<email>braimanm@gmail.com</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>
+			https://github.com/braimanm/selenium-uitaf
+		</url>
+	</scm>
+
 
 	<properties>
 		<compiler.version>1.7</compiler.version>
@@ -79,4 +102,40 @@
 
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>gpg.sign</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+	<distributionManagement>
+      <repository>
+          <id>nexus-releases</id>
+          <name>Nexus Release Repository</name>
+          <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      </repository>
+  </distributionManagement>
+
 </project>
