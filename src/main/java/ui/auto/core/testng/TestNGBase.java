@@ -12,7 +12,7 @@ import ru.yandex.qatools.allure.events.MakeAttachmentEvent;
 import ui.auto.core.support.TestContext;
 
 public class TestNGBase {
-	protected static TestContext context;
+	protected TestContext context;
 	private ITestContext testNgContext;
 	
 	@BeforeTest
