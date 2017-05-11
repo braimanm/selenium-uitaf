@@ -1,33 +1,63 @@
 package ui.auto.core.testng;
 
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-
 import ru.yandex.qatools.allure.Allure;
-import ru.yandex.qatools.allure.events.MakeAttachmentEvent;
 import ru.yandex.qatools.allure.events.TestCaseFailureEvent;
 import ru.yandex.qatools.allure.events.TestCaseFinishedEvent;
 import ru.yandex.qatools.allure.testng.AllureTestListener;
-import ui.auto.core.support.TestContext;
+import ui.auto.core.support.TestProperties;
 
 public class AllureTestNGListener extends AllureTestListener{	
 	 private Allure lifecycle = Allure.LIFECYCLE;
-	
-	 @Override
+
+	@Override
+	public void onStart(ITestContext iTestContext) {
+		super.onStart(iTestContext);
+		for (ITestNGMethod method : iTestContext.getAllTestMethods()) {
+			Retry retry = method.getConstructorOrMethod().getMethod().getAnnotation(Retry.class);
+			if (isCandidateForRetry(method) && method.getRetryAnalyzer() == null && retry != null) {
+				int times = (retry.value() == 0) ? TestProperties.getInstance().getTestDefaultRetry() : retry.value();
+				method.setRetryAnalyzer(new RetryListener(times));
+			}
+		}
+	}
+
+	@Override
 	 public void onTestFailure(ITestResult iTestResult) {
 		 lifecycle.fire(new TestCaseFailureEvent().withThrowable(iTestResult.getThrowable()));
-		 takeScreenShot(iTestResult);
+		TestNGBase.takeScreenshot("Failed Test Screenshot");
+		TestNGBase.takeHTML("Failed Test HTML Source");
 		 lifecycle.fire(new TestCaseFinishedEvent());
 	}
 
-	private void takeScreenShot(ITestResult iTestResult){
-		TestContext context=(TestContext) iTestResult.getTestContext().getAttribute("context");
-		if (context!=null && context.getDriver()!=null) {
-			byte[] attachment=((TakesScreenshot) context.getDriver()).getScreenshotAs(OutputType.BYTES);
-			MakeAttachmentEvent ev=new MakeAttachmentEvent(attachment, "Failed Test Screenshot", "image/png");
-		   	lifecycle.fire(ev);
+
+	protected boolean isCandidateForRetry(ITestNGMethod method) {
+		// Annotation:  @Test
+		if (method.isTest()) {
+			return true;
 		}
+
+		// Annotation:  @BeforeTest
+		if (method.isBeforeTestConfiguration()) {
+			return true;
+		}
+
+		// Annotation:  @AfterTest
+		if (method.isAfterTestConfiguration()) {
+			return true;
+		}
+
+		// Annotation:  @BeforeMethod
+		if (method.isBeforeMethodConfiguration()) {
+			return true;
+		}
+
+		// Annotation:  @AfterMethod
+		return method.isAfterMethodConfiguration();
+
 	}
+
 
 }

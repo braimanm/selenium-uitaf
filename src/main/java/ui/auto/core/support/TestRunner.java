@@ -1,10 +1,6 @@
 package ui.auto.core.support;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
+import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -13,19 +9,22 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.testng.TestNG;
 import org.testng.reporters.Files;
-
-import com.thoughtworks.xstream.XStream;
-
 import ru.yandex.qatools.allure.AllureMain;
 import ru.yandex.qatools.allure.config.AllureConfig;
 import ru.yandex.qatools.commons.model.Environment;
-import ui.auto.core.testng.AllureTestNGListener;
+import ui.auto.core.testng.TestParameterValidator;
+
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.List;
 
 
 public class TestRunner {
 	private String resultsFolder;
 	private String reportFolder;
-	private int port = 8090;
 	
 	public TestRunner(){
 		TestProperties props = TestProperties.getInstance();
@@ -36,42 +35,41 @@ public class TestRunner {
 	
 	public int runTests(List<String> suites) throws IOException{
 		for (String suite:suites){
-			File file = new File(suite);
 			InputStream is=Thread.currentThread().getContextClassLoader().getResourceAsStream(suite);
-			file=new File(suite);
-			FileUtils.copyInputStreamToFile(is,file);
+			File file = new File(suite);
+			if (is != null) {
+				FileUtils.copyInputStreamToFile(is, file);
+			} else if (!file.exists()) {
+				throw new RuntimeException("Suite file '" + suite + "' does not exists on the file system!");
+			}
 		}
-		Object atl=new AllureTestNGListener();
-		TestNG testNg=new TestNG();
-		testNg.addListener(atl);
+		TestNG testNg = new TestNG(false);
+		testNg.addListener(new TestParameterValidator());
 		testNg.setTestSuites(suites);
-		testNg.setSuiteThreadPoolSize(5);
+		testNg.setSuiteThreadPoolSize(1);
 		testNg.run();
 		saveEnvironment();
 		return testNg.getStatus();
 	}
 	
 	public void generateReport() throws IOException {
-		String[] arguments = {resultsFolder,reportFolder};
+		String[] arguments = {resultsFolder, reportFolder};
 		AllureMain.main(arguments);
 	}
 	
 	public void openReport() throws Exception {
 		Server server = setUpServer();
 		server.start();
-		if (Desktop.isDesktopSupported()) {
-			Desktop.getDesktop().browse(server.getURI());
+		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+			Desktop.getDesktop().browse(new URI("http://localhost:" +
+					TestProperties.getInstance().getReportPort()));
 		}
         server.join();
 	}
 	
 	 private Server setUpServer() {
-		 	String p = System.getProperty("local.server.port");
-		 	if (p != null) {
-		 		port = Integer.parseInt(p);
-		 	}
-	        Server server = new Server(port);
-	        ResourceHandler handler = new ResourceHandler();
+		 Server server = new Server(TestProperties.getInstance().getReportPort());
+		 ResourceHandler handler = new ResourceHandler();
 	        handler.setDirectoriesListed(true);
 	        handler.setWelcomeFiles(new String[]{"index.html"});
 	        handler.setResourceBase(reportFolder);
@@ -100,5 +98,20 @@ public class TestRunner {
 				e.printStackTrace();
 			}
 		}
+
+	public void deleteResultsFolder() throws IOException {
+		File resFolder = new File(resultsFolder);
+		if (resFolder.exists()) {
+			FileUtils.forceDelete(resFolder);
+		}
+	}
+
+	public void deleteReportFolder() throws IOException {
+		File resFolder = new File(reportFolder);
+		if (resFolder.exists()) {
+			FileUtils.forceDelete(resFolder);
+		}
+	}
+
 }
 

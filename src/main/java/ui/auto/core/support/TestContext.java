@@ -1,10 +1,7 @@
 package ui.auto.core.support;
 
-import java.net.URL;
-import java.net.URLConnection;
-
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
-
 import ui.auto.core.context.PageComponentContext;
 
 public class TestContext extends PageComponentContext {
@@ -14,24 +11,33 @@ public class TestContext extends PageComponentContext {
 		super(driver);
 		setTimeouts();
 	}
-	
+
 	public TestContext() {
 		super(null);
+	}
+
+	public void init() {
 		driver = props.getBrowserType().getNewWebDriver();
-		setTimeouts();
-		isWebLive();
+		String res = props.getScreenSize();
+		if (res != null) {
+			String[] resWH = res.toLowerCase().split("x");
+			int width = Integer.parseInt(resWH[0].trim());
+			int height = Integer.parseInt(resWH[1].trim());
+			Dimension dim = new Dimension(width, height);
+			driver.manage().window().setSize(dim);
+		}
 	}
 	
 	public String getAlias(String key) {
-		return (String) getGlobalAliases().get(key);
+		return getGlobalAliases().get(key);
 	}
 	
 	public void setAlias(String key,String value) {
 		getGlobalAliases().put(key, value);
 	}
-	
-	
-	private void setTimeouts(){
+
+
+	protected void setTimeouts() {
 		if (props.getElementTimeout()>0) {
 			setAjaxTimeOut(props.getElementTimeout());
 		}
@@ -39,25 +45,5 @@ public class TestContext extends PageComponentContext {
 			setWaitForUrlTimeOut(props.getPageTimeout());
 		}
 	}
-	
-	private void isWebLive(){
-		String surl = props.getAutURL();
-		if (surl == null) {
-			return;
-		}
-		try {
-			URL url=new URL(surl);
-			URLConnection urlConn=url.openConnection();
-			urlConn.setConnectTimeout(props.getPageTimeout());
-			urlConn.connect();
-		} catch (Exception e) {
-			if (super.getDriver() != null) {
-				super.getDriver().quit();
-			}
-			throw new  RuntimeException("Url \"" + surl + "\" is not responding!",e);
-		}
-		driver.get(surl);
-	}
-	
-	
+
 }
