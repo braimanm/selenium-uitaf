@@ -2,23 +2,15 @@ package ui.auto.core.support;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.testng.TestNG;
 import org.testng.reporters.Files;
 import ru.yandex.qatools.allure.AllureMain;
 import ru.yandex.qatools.allure.config.AllureConfig;
 import ru.yandex.qatools.commons.model.Environment;
-import ui.auto.core.testng.TestParameterValidator;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.List;
 
 
@@ -44,7 +36,6 @@ public class TestRunner {
 			}
 		}
 		TestNG testNg = new TestNG(false);
-		testNg.addListener(new TestParameterValidator());
 		testNg.setTestSuites(suites);
 		testNg.setSuiteThreadPoolSize(1);
 		testNg.run();
@@ -56,32 +47,8 @@ public class TestRunner {
 		String[] arguments = {resultsFolder, reportFolder};
 		AllureMain.main(arguments);
 	}
-	
-	public void openReport() throws Exception {
-		Server server = setUpServer();
-		server.start();
-		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-			Desktop.getDesktop().browse(new URI("http://localhost:" +
-					TestProperties.getInstance().getReportPort()));
-		}
-        server.join();
-	}
-	
-	 private Server setUpServer() {
-		 Server server = new Server(TestProperties.getInstance().getReportPort());
-		 ResourceHandler handler = new ResourceHandler();
-	        handler.setDirectoriesListed(true);
-	        handler.setWelcomeFiles(new String[]{"index.html"});
-	        handler.setResourceBase(reportFolder);
-	        HandlerList handlers = new HandlerList();
-	        handlers.setHandlers(new Handler[]{handler, new DefaultHandler()});
-	        server.setStopAtShutdown(true);
-	        server.setHandler(handlers);
-	        server.setStopAtShutdown(true);
-	        return server;
-	    }
-	
-		public void saveEnvironment(){
+
+	public void saveEnvironment(){
 			TestProperties prop=TestProperties.getInstance();
 			Environment environment=new Environment().withName("Environment");
 			environment.withParameter(prop.getAsParameters());

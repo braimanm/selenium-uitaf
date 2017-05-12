@@ -36,7 +36,6 @@
 		<selenium.version>3.4.0</selenium.version>
 		<page-component.version>1.3.0</page-component.version>
 		<testNg.version>6.11</testNg.version>
-		<jetty.version>9.2.2.v20140723</jetty.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -82,11 +81,6 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>${testNg.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>${jetty.version}</version>
 		</dependency>
 	</dependencies>
 

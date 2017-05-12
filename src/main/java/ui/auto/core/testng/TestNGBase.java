@@ -11,6 +11,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Listeners;
 import ru.yandex.qatools.allure.Allure;
 import ru.yandex.qatools.allure.events.MakeAttachmentEvent;
 import ui.auto.core.support.TestContext;
@@ -21,6 +22,7 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.Set;
 
+@Listeners({AllureTestNGListener.class, TestParameterValidator.class})
 public class TestNGBase {
 	private static final ThreadLocal<TestContext> context = new ThreadLocal<TestContext>() {
 		@Override
@@ -92,11 +94,11 @@ public class TestNGBase {
 		context.remove();
 		testNgContext.remove();
 	}
-	
+
 	protected void setAttribute(String alias,Object value){
 		testNgContext.get().getSuite().setAttribute(alias, value);
 	}
-	
+
 	protected Object getAttribute(String alias){
 		return testNgContext.get().getSuite().getAttribute(alias);
 	}
@@ -105,7 +107,7 @@ public class TestNGBase {
 		if (context.get() != null && context.get().getDriver() != null) {
 			byte[] attachment=data.toXML().getBytes();
 			MakeAttachmentEvent ev=new MakeAttachmentEvent(attachment, name, "text/xml");
-		   	Allure.LIFECYCLE.fire(ev);
+			Allure.LIFECYCLE.fire(ev);
 		}
 	}
 
