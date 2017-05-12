@@ -32,21 +32,17 @@ public class TestNGBase {
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 	private long time;
 
-	public static TestContext getTestContext() {
-		return context.get();
-	}
-
 	public static void takeScreenshot(String title) {
-		if (getTestContext() != null && getTestContext().getDriver() != null) {
-			byte[] attachment = ((TakesScreenshot) getTestContext().getDriver()).getScreenshotAs(OutputType.BYTES);
+		if (context.get().getDriver() != null) {
+			byte[] attachment = ((TakesScreenshot) context.get().getDriver()).getScreenshotAs(OutputType.BYTES);
 			MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, title, "image/png");
 			Allure.LIFECYCLE.fire(ev);
 		}
 	}
 
 	public static void takeHTML(String title) {
-		if (getTestContext() != null && getTestContext().getDriver() != null) {
-			byte[] attachment = (getTestContext().getDriver().getPageSource()).getBytes();
+		if (context.get().getDriver() != null) {
+			byte[] attachment = (context.get().getDriver().getPageSource()).getBytes();
 			MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, title, "text/html");
 			Allure.LIFECYCLE.fire(ev);
 		}
@@ -56,6 +52,18 @@ public class TestNGBase {
 		String testInfo = testNgContext.get().getCurrentXmlTest().getName();
 		testInfo += " " + testNgContext.get().getCurrentXmlTest().getTestParameters().toString();
 		return testInfo;
+	}
+
+	public static TestContext CONTEXT() {
+		return context.get();
+	}
+
+	public TestContext getContext() {
+		if (context.get().getDriver() == null) {
+			context.get().init();
+			logInfo("+INITIALIZING CONTEXT: " + context.get().getDriver().toString());
+		}
+		return context.get();
 	}
 
 	@BeforeSuite
@@ -77,21 +85,12 @@ public class TestNGBase {
 	@AfterTest(alwaysRun = true)
 	public void closeDriver(){
 		time = (System.currentTimeMillis() - time) / 1000;
-		if (getTestContext() != null && getTestContext().getDriver() != null) {
-			logInfo("-CLOSING CONTEXT: " + getTestContext().getDriver().toString());
-			//getTestContext().getDriver().close();
-			getTestContext().getDriver().quit();
+		if (context.get().getDriver() != null) {
+			logInfo("-CLOSING CONTEXT: " + context.get().getDriver().toString());
+			context.get().getDriver().quit();
 		}
 		context.remove();
 		testNgContext.remove();
-	}
-
-	protected TestContext initTestContext() {
-		if (getTestContext() != null && getTestContext().getDriver() == null) {
-			getTestContext().init();
-			logInfo("+INITIALIZING CONTEXT: " + getTestContext().getDriver().toString());
-		}
-		return getTestContext();
 	}
 	
 	protected void setAttribute(String alias,Object value){
@@ -103,7 +102,7 @@ public class TestNGBase {
 	}
 
 	public void attachDataSet(DataPersistence data, String name) {
-		if (getTestContext() != null && getTestContext().getDriver() != null) {
+		if (context.get() != null && context.get().getDriver() != null) {
 			byte[] attachment=data.toXML().getBytes();
 			MakeAttachmentEvent ev=new MakeAttachmentEvent(attachment, name, "text/xml");
 		   	Allure.LIFECYCLE.fire(ev);

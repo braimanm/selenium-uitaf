@@ -11,9 +11,9 @@ public class BrowserPlatformPropertyConverter implements Converter {
 		if (!(obj instanceof String)){
 			return null;
 		}
-		Platform browserPlatform=Platform.valueOf((String) obj);
-		return browserPlatform;
-	}
+
+        return Platform.valueOf((String) obj);
+    }
 	
 
 }

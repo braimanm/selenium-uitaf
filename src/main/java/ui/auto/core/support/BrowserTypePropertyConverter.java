@@ -10,8 +10,8 @@ public class BrowserTypePropertyConverter implements Converter {
 		if (!(obj instanceof String)){
 			return null;
 		}
-		WebDriverTypeEnum browserType = WebDriverTypeEnum.valueOf((String) obj);
-		return browserType;
+
+		return WebDriverTypeEnum.valueOf((String) obj);
 	}
 
 }
