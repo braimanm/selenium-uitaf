@@ -22,7 +22,7 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.Set;
 
-@Listeners({AllureTestNGListener.class, TestParameterValidator.class})
+@Listeners({AllureTestNGListener.class})
 public class TestNGBase {
 	private static final ThreadLocal<TestContext> context = new ThreadLocal<TestContext>() {
 		@Override

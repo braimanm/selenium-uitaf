@@ -7,6 +7,7 @@ import org.testng.reporters.Files;
 import ru.yandex.qatools.allure.AllureMain;
 import ru.yandex.qatools.allure.config.AllureConfig;
 import ru.yandex.qatools.commons.model.Environment;
+import ui.auto.core.testng.TestParameterValidator;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +37,8 @@ public class TestRunner {
 			}
 		}
 		TestNG testNg = new TestNG(false);
-		testNg.setTestSuites(suites);
+        testNg.addListener(new TestParameterValidator());
+        testNg.setTestSuites(suites);
 		testNg.setSuiteThreadPoolSize(1);
 		testNg.run();
 		saveEnvironment();
