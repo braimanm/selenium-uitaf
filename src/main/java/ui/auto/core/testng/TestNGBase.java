@@ -60,6 +60,12 @@ public class TestNGBase {
 		return context.get();
 	}
 
+    public static void attachDataSet(DataPersistence data, String name) {
+        byte[] attachment = data.toXML().getBytes();
+        MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, name, "text/xml");
+        Allure.LIFECYCLE.fire(ev);
+    }
+
 	public TestContext getContext() {
 		if (context.get().getDriver() == null) {
 			context.get().init();
@@ -101,14 +107,6 @@ public class TestNGBase {
 
 	protected Object getAttribute(String alias){
 		return testNgContext.get().getSuite().getAttribute(alias);
-	}
-
-	public void attachDataSet(DataPersistence data, String name) {
-		if (context.get() != null && context.get().getDriver() != null) {
-			byte[] attachment=data.toXML().getBytes();
-			MakeAttachmentEvent ev=new MakeAttachmentEvent(attachment, name, "text/xml");
-			Allure.LIFECYCLE.fire(ev);
-		}
 	}
 
 	private StringBuilder getFailedConfigOrTests(Set<ITestResult> results) {
