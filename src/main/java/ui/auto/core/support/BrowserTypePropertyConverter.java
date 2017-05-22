@@ -1,17 +1,13 @@
 package ui.auto.core.support;
 
-import org.apache.commons.beanutils.Converter;
+
+import ru.qatools.properties.converters.Converter;
 
 public class BrowserTypePropertyConverter implements Converter {
 
-	@SuppressWarnings("rawtypes")
+
 	@Override
-	public Object convert(Class clz, Object obj) {
-		if (!(obj instanceof String)){
-			return null;
-		}
-
-		return WebDriverTypeEnum.valueOf((String) obj);
+	public Object convert(String from) throws Exception {
+		return WebDriverTypeEnum.valueOf(from);
 	}
-
 }

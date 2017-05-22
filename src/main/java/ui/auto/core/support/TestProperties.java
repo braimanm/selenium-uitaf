@@ -3,11 +3,11 @@ package ui.auto.core.support;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import ru.qatools.properties.Property;
+import ru.qatools.properties.PropertyLoader;
+import ru.qatools.properties.Resource;
+import ru.qatools.properties.Use;
 import ru.yandex.qatools.commons.model.Parameter;
-import ru.yandex.qatools.properties.PropertyLoader;
-import ru.yandex.qatools.properties.annotations.Property;
-import ru.yandex.qatools.properties.annotations.Resource;
-import ru.yandex.qatools.properties.annotations.Use;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -78,7 +78,7 @@ public class TestProperties {
 	public static TestProperties getInstance() {
 		if (testProperties == null) {
 			testProperties = new TestProperties();
-			PropertyLoader.populate(testProperties);
+			PropertyLoader.newInstance().populate(testProperties);
 		}
 		return testProperties;
 	}
