@@ -8,6 +8,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.opera.OperaDriver;
@@ -21,28 +22,29 @@ import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+@SuppressWarnings("unused")
 public enum WebDriverTypeEnum {
-	CHROME ("chrome",ChromeDriver.class),
-	EDGE ("MicrosoftEdge",EdgeDriver.class),
-	FIREFOX ("firefox",FirefoxDriver.class),
-	IE ("internet explorer",InternetExplorerDriver.class),
-	OPERA_BLINK ("operablink",OperaDriver.class),
+    CHROME ("chrome", ChromeDriver.class),
+    EDGE ("MicrosoftEdge", EdgeDriver.class),
+    FIREFOX ("firefox", FirefoxDriver.class),
+    IE ("internet explorer", InternetExplorerDriver.class),
+    OPERA_BLINK ("operablink", OperaDriver.class),
     SAFARI("safari", SafariDriver.class);
 
     String driverName;
-	Class<? extends WebDriver> driverClass;
+    Class<? extends WebDriver> driverClass;
 
     WebDriverTypeEnum(String driverName, Class<? extends WebDriver> driverClass) {
         this.driverClass = driverClass;
-		this.driverName = driverName;
-	}
-	
-	public String getDriverName() {
-		return driverName;
-	}
-	
-	public WebDriver getNewWebDriver() {
-        TestProperties prop = TestProperties.getInstance();
+        this.driverName = driverName;
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public WebDriver getNewWebDriver() {
+        TestProperties prop = TestContext.getTestProperties();
         DesiredCapabilities capabilities = new DesiredCapabilities();
         Proxy proxy = setupWebDriverProxy();
         if (proxy != null) {
@@ -51,16 +53,14 @@ public enum WebDriverTypeEnum {
         if (prop.getAcceptSSLCerts()) {
             capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         }
-
+        capabilities.merge(getCapabilities());
         if (prop.getRemoteURL() != null) {
-            capabilities.merge(getCapabilities());
             try {
                 return new RemoteWebDriver(new URL(prop.getRemoteURL()), capabilities);
             } catch (MalformedURLException e) {
                 throw new RuntimeException("Malformed URL!", e);
             }
         }
-
         switch (this) {
             case FIREFOX:
                 FirefoxProfile profile = new FirefoxProfile();
@@ -77,31 +77,19 @@ public enum WebDriverTypeEnum {
 
                 capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 
-                if (prop.getFirefoxBin() != null) {
-                    System.setProperty("webdriver.firefox.bin", prop.getFirefoxBin());
-                }
-
-                if (prop.noMarionette()) {
-                    System.setProperty("webdriver.firefox.marionette", "false");
-                }
-
-                return new FirefoxDriver(capabilities);
+                return new FirefoxDriver(new FirefoxOptions(capabilities));
 
             case CHROME:
+                ChromeOptions chromeOptions = new ChromeOptions();
+                chromeOptions.merge(capabilities);
                 if (prop.getUserAgent() != null) {
-                    ChromeOptions options = new ChromeOptions();
-                    options.addArguments("user-agent=" + prop.getUserAgent());
-                    capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+                    chromeOptions.addArguments("user-agent=" + prop.getUserAgent());
                 }
-                return new ChromeDriver(capabilities);
+                return new ChromeDriver(chromeOptions);
 
             case SAFARI:
-                capabilities.merge(getCapabilities());
                 SafariOptions options = SafariOptions.fromCapabilities(capabilities);
-                options.setUseCleanSession(true);
-                //options.setUseTechnologyPreview(true);
-                capabilities.setCapability("safari.options", options);
-                return new SafariDriver(capabilities);
+                return new SafariDriver(options);
             default:
                 try {
                     Constructor<? extends WebDriver> constructor = driverClass.getConstructor(Capabilities.class);
@@ -114,7 +102,7 @@ public enum WebDriverTypeEnum {
     }
 
     protected Proxy setupWebDriverProxy() {
-        TestProperties prop = TestProperties.getInstance();
+        TestProperties prop = TestContext.getTestProperties();
         Proxy proxy = null;
         if (prop.getHttpProxy() != null) {
             proxy = new Proxy();
@@ -130,7 +118,7 @@ public enum WebDriverTypeEnum {
     }
 
     protected DesiredCapabilities getCapabilities() {
-        TestProperties prop = TestProperties.getInstance();
+        TestProperties prop = TestContext.getTestProperties();
         Platform platform = prop.getBrowserPlatform();
         if (platform == null) {
             platform = Platform.ANY;
@@ -142,5 +130,5 @@ public enum WebDriverTypeEnum {
         capabilities.merge(prop.getExtraCapabilities());
         return capabilities;
     }
-	
+
 }

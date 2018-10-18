@@ -4,21 +4,26 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import ui.auto.core.context.PageComponentContext;
 
+@SuppressWarnings("unused")
 public class TestContext extends PageComponentContext {
-	private TestProperties props = TestProperties.getInstance(); 
-	
+	private static ThreadLocal<TestProperties> props = ThreadLocal.withInitial(TestProperties::new);
+
 	public TestContext(WebDriver driver) {
 		super(driver);
 		setTimeouts();
 	}
 
 	public TestContext() {
-		super(null);
+		this(null);
+	}
+
+	public static TestProperties getTestProperties() {
+		return props.get();
 	}
 
 	public void init() {
-		driver = props.getBrowserType().getNewWebDriver();
-		String res = props.getScreenSize();
+		driver = getTestProperties().getBrowserType().getNewWebDriver();
+		String res = getTestProperties().getScreenSize();
 		if (res != null) {
 			String[] resWH = res.toLowerCase().split("x");
 			int width = Integer.parseInt(resWH[0].trim());
@@ -27,22 +32,22 @@ public class TestContext extends PageComponentContext {
 			driver.manage().window().setSize(dim);
 		}
 	}
-	
+
 	public String getAlias(String key) {
 		return getGlobalAliases().get(key);
 	}
-	
+
 	public void setAlias(String key,String value) {
 		getGlobalAliases().put(key, value);
 	}
 
 
-	protected void setTimeouts() {
-		if (props.getElementTimeout()>0) {
-			setAjaxTimeOut(props.getElementTimeout());
+	private void setTimeouts() {
+		if (getTestProperties().getElementTimeout()>0) {
+			setAjaxTimeOut(getTestProperties().getElementTimeout());
 		}
-		if (props.getPageTimeout()>0) {
-			setWaitForUrlTimeOut(props.getPageTimeout());
+		if (getTestProperties().getPageTimeout()>0) {
+			setWaitForUrlTimeOut(getTestProperties().getPageTimeout() * 1000);
 		}
 	}
 

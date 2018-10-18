@@ -8,7 +8,7 @@ public class RetryListener implements IRetryAnalyzer {
     private int count = 0;
     private int max;
 
-    public RetryListener(int times) {
+    RetryListener(int times) {
         max = times;
     }
 

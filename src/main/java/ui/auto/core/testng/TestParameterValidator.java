@@ -5,7 +5,6 @@ import org.testng.IInvokedMethodListener;
 import org.testng.ITestResult;
 import org.testng.annotations.Parameters;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 public class TestParameterValidator implements IInvokedMethodListener {
@@ -13,9 +12,9 @@ public class TestParameterValidator implements IInvokedMethodListener {
     @Override
     public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
         Method testMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
-        Annotation paramAnnotation = testMethod.getAnnotation(Parameters.class);
+        Parameters paramAnnotation = testMethod.getAnnotation(Parameters.class);
         if (paramAnnotation != null) {
-            String[] params = ((Parameters) paramAnnotation).value();
+            String[] params = (paramAnnotation).value();
             for (String param : params) {
                 String value = testResult.getTestContext().getCurrentXmlTest().getParameter(param);
                 if (value == null) {

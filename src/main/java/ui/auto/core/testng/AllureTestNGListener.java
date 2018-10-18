@@ -7,10 +7,11 @@ import ru.yandex.qatools.allure.Allure;
 import ru.yandex.qatools.allure.events.TestCaseFailureEvent;
 import ru.yandex.qatools.allure.events.TestCaseFinishedEvent;
 import ru.yandex.qatools.allure.testng.AllureTestListener;
-import ui.auto.core.support.TestProperties;
+import ui.auto.core.support.TestContext;
 
-public class AllureTestNGListener extends AllureTestListener{	
-	 private Allure lifecycle = Allure.LIFECYCLE;
+
+public class AllureTestNGListener extends AllureTestListener {
+	private Allure lifecycle = Allure.LIFECYCLE;
 
 	@Override
 	public void onStart(ITestContext iTestContext) {
@@ -18,22 +19,28 @@ public class AllureTestNGListener extends AllureTestListener{
 		for (ITestNGMethod method : iTestContext.getAllTestMethods()) {
 			Retry retry = method.getConstructorOrMethod().getMethod().getAnnotation(Retry.class);
 			if (isCandidateForRetry(method) && method.getRetryAnalyzer() == null && retry != null) {
-				int times = (retry.value() == 0) ? TestProperties.getInstance().getTestDefaultRetry() : retry.value();
+				int times = (retry.value() == 0) ? TestContext.getTestProperties().getTestDefaultRetry() : retry.value();
 				method.setRetryAnalyzer(new RetryListener(times));
 			}
 		}
 	}
 
 	@Override
-	 public void onTestFailure(ITestResult iTestResult) {
-		 lifecycle.fire(new TestCaseFailureEvent().withThrowable(iTestResult.getThrowable()));
+	public void onTestFailure(ITestResult iTestResult) {
+		lifecycle.fire(new TestCaseFailureEvent().withThrowable(iTestResult.getThrowable()));
 		TestNGBase.takeScreenshot("Failed Test Screenshot");
 		TestNGBase.takeHTML("Failed Test HTML Source");
-		 lifecycle.fire(new TestCaseFinishedEvent());
+		lifecycle.fire(new TestCaseFinishedEvent());
 	}
 
+	@Override
+	public void onTestSkipped(ITestResult iTestResult) {
+		TestNGBase.takeScreenshot("Failed Test Screenshot");
+		TestNGBase.takeHTML("Failed Test HTML Source");
+		super.onTestSkipped(iTestResult);
+	}
 
-	protected boolean isCandidateForRetry(ITestNGMethod method) {
+	private boolean isCandidateForRetry(ITestNGMethod method) {
 		// Annotation:  @Test
 		if (method.isTest()) {
 			return true;
