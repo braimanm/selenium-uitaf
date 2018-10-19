@@ -53,7 +53,7 @@ public class TestProperties {
 	@Hide
 	@Property("webdriver.https.proxy")
 	private String httpsProxy;
-	@Property(("webdriver.screen.size"))
+	@Property("webdriver.screen.size")
 	private String screenSize;
 	@Hide
 	@Property("webdriver.accept.ssl.certs")
@@ -182,9 +182,11 @@ public class TestProperties {
 
 	public List<Parameter> getAsParameters(){
 		List<Parameter> params=new ArrayList<>();
-		params.add(new Parameter().withKey("test.env.name").withName("test.env.name").withValue(testEnvironment.getEnvironmentName()));
-        params.add(new Parameter().withKey("test.env.url").withName("test.env.url").withValue(testEnvironment.getUrl()));
-		for (Field field: this.getClass().getDeclaredFields()){
+		if (testEnvironment != null) {
+			params.add(new Parameter().withKey("test.env.name").withName("test.env.name").withValue(testEnvironment.getEnvironmentName()));
+			params.add(new Parameter().withKey("test.env.url").withName("test.env.url").withValue(testEnvironment.getUrl()));
+		}
+		for (Field field : this.getClass().getDeclaredFields()) {
 			if (field.isAnnotationPresent(Property.class) && ! field.isAnnotationPresent(Hide.class)) {
 				String property= field.getAnnotation(Property.class).value();
 				String value;
