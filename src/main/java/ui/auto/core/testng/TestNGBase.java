@@ -3,6 +3,7 @@ package ui.auto.core.testng;
 import datainstiller.data.DataAliases;
 import datainstiller.data.DataPersistence;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Set;
+import java.util.function.Consumer;
 
 @Listeners({AllureTestNGListener.class})
 public class TestNGBase {
@@ -31,30 +33,42 @@ public class TestNGBase {
 	private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 	private long time;
 
+    public synchronized static TestContext CONTEXT() {
+        return context.get();
+    }
+
 	public synchronized static void takeScreenshot(String title) {
-		if (context.get().getDriver() != null) {
-			byte[] attachment = ((TakesScreenshot) context.get().getDriver()).getScreenshotAs(OutputType.BYTES);
+        if (CONTEXT().getDriver() != null) {
+            byte[] attachment = ((TakesScreenshot) CONTEXT().getDriver()).getScreenshotAs(OutputType.BYTES);
 			MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, title, "image/png");
 			Allure.LIFECYCLE.fire(ev);
 		}
 	}
 
 	public synchronized static void takeHTML(String title) {
-		if (context.get().getDriver() != null) {
-			byte[] attachment = (context.get().getDriver().getPageSource()).getBytes();
+        if (CONTEXT().getDriver() != null) {
+            byte[] attachment = (CONTEXT().getDriver().getPageSource()).getBytes();
 			MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, title, "text/html");
 			Allure.LIFECYCLE.fire(ev);
 		}
 	}
 
+    public TestContext getContext() {
+        return getContext(null);
+    }
+
+    public TestContext getContext(Consumer<MutableCapabilities> capabilities) {
+        if (CONTEXT().getDriver() == null) {
+            CONTEXT().init(capabilities);
+            logInfo("+INITIALIZING CONTEXT: " + CONTEXT().getDriver().toString());
+        }
+        return CONTEXT();
+    }
+
 	public synchronized static String getTestInfo() {
 		String testInfo = testNgContext.get().getCurrentXmlTest().getName();
 		testInfo += " " + testNgContext.get().getCurrentXmlTest().getLocalParameters().toString();
 		return testInfo;
-	}
-
-	public synchronized static TestContext CONTEXT() {
-		return context.get();
 	}
 
 	private synchronized static String resolveAliases(DataPersistence data) {
@@ -75,14 +89,6 @@ public class TestNGBase {
 		byte[] attachment =  resolveAliases(data).getBytes();
 		MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, name, "text/xml");
 		Allure.LIFECYCLE.fire(ev);
-	}
-
-	public TestContext getContext() {
-		if (context.get().getDriver() == null) {
-			context.get().init();
-			logInfo("+INITIALIZING CONTEXT: " + context.get().getDriver().toString());
-		}
-		return context.get();
 	}
 
 	private void setUpDrivers() {
@@ -112,9 +118,9 @@ public class TestNGBase {
 	@AfterTest(alwaysRun = true)
 	public void closeDriver(){
 		time = (System.currentTimeMillis() - time) / 1000;
-		if (context.get().getDriver() != null) {
-			logInfo("-CLOSING CONTEXT: " + context.get().getDriver().toString());
-			context.get().getDriver().quit();
+        if (CONTEXT().getDriver() != null) {
+            logInfo("-CLOSING CONTEXT: " + CONTEXT().getDriver().toString());
+            CONTEXT().getDriver().quit();
 		}
 		context.remove();
 	}
