@@ -12,6 +12,7 @@ import ui.auto.core.support.TestContext;
 import java.util.ArrayList;
 import java.util.List;
 
+@FunctionalInterface
 public interface ArtificialStep {
 
     default Throwable executeStep(String stepTitle, long expectedExecutionTime) {

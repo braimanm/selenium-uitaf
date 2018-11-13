@@ -59,6 +59,7 @@ public class PageObjectModel extends PageObject {
         if (env != null) {
             jexlContext.set("env", env);
         }
+        jexlContext.set("userProvider", UserProvider.getInstance());
     }
 
 
