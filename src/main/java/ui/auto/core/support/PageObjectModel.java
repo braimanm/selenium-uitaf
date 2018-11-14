@@ -47,11 +47,12 @@ public class PageObjectModel extends PageObject {
 
     @Override
     protected void initJexlContext(JexlContext jexlContext) {
-        jexlContext.set("year_month_day", DateTimeFormatter.ofPattern("yyyy-M-d").format(LocalDateTime.now()));
-        jexlContext.set("day_month_year", DateTimeFormatter.ofPattern("d-M-yyyy").format(LocalDateTime.now()));
-        jexlContext.set("month_day_year", DateTimeFormatter.ofPattern("M-d-yyyy").format(LocalDateTime.now()));
-        jexlContext.set("time_stamp", DateTimeFormatter.ofPattern("yyyyMMddkkmmss-S").format(LocalDateTime.now()));
-        String timeStampThreadId = DateTimeFormatter.ofPattern("yyMMddkkmmss").format(LocalDateTime.now()) + Thread.currentThread().getId();
+        LocalDateTime now = LocalDateTime.now();
+        jexlContext.set("year_month_day", DateTimeFormatter.ofPattern("yyyy-M-d").format(now));
+        jexlContext.set("day_month_year", DateTimeFormatter.ofPattern("d-M-yyyy").format(now));
+        jexlContext.set("month_day_year", DateTimeFormatter.ofPattern("M-d-yyyy").format(now));
+        jexlContext.set("time_stamp", DateTimeFormatter.ofPattern("yyyyMMddkkmmss-S").format(now));
+        String timeStampThreadId = DateTimeFormatter.ofPattern("yyMMddkkmmss").format(now) + Thread.currentThread().getId();
         jexlContext.set("time_stamp_thread", timeStampThreadId);
 
         EnvironmentsSetup.Environment env = TestContext.getTestProperties().getTestEnvironment();
