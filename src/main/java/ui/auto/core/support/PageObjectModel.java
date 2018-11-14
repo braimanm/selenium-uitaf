@@ -47,21 +47,19 @@ public class PageObjectModel extends PageObject {
 
     @Override
     protected void initJexlContext(JexlContext jexlContext) {
-        jexlContext.set("minutes", DateTimeFormatter.ofPattern("mm"));
-        jexlContext.set("hours", DateTimeFormatter.ofPattern("hh"));
-        jexlContext.set("ampm", DateTimeFormatter.ofPattern("a"));
-        jexlContext.set("day_month_year", DateTimeFormatter.ofPattern("d-M-yyyy"));
-        jexlContext.set("time_stamp", DateTimeFormatter.ofPattern("yyyyMMddkkmmss-S"));
+        jexlContext.set("year_month_day", DateTimeFormatter.ofPattern("yyyy-M-d").format(LocalDateTime.now()));
+        jexlContext.set("day_month_year", DateTimeFormatter.ofPattern("d-M-yyyy").format(LocalDateTime.now()));
+        jexlContext.set("month_day_year", DateTimeFormatter.ofPattern("M-d-yyyy").format(LocalDateTime.now()));
+        jexlContext.set("time_stamp", DateTimeFormatter.ofPattern("yyyyMMddkkmmss-S").format(LocalDateTime.now()));
         String timeStampThreadId = DateTimeFormatter.ofPattern("yyMMddkkmmss").format(LocalDateTime.now()) + Thread.currentThread().getId();
         jexlContext.set("time_stamp_thread", timeStampThreadId);
 
         EnvironmentsSetup.Environment env = TestContext.getTestProperties().getTestEnvironment();
         if (env != null) {
             jexlContext.set("env", env);
+            jexlContext.set("userProvider", UserProvider.getInstance());
         }
-        jexlContext.set("userProvider", UserProvider.getInstance());
     }
-
 
     private List<Label> getLables(DataPersistence data, String labelAlias, LabelName labelName) {
         DataAliases aliases = data.getDataAliases();

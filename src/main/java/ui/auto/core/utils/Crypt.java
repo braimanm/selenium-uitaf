@@ -13,7 +13,7 @@ import java.security.spec.KeySpec;
 import java.util.Base64;
 
 public class Crypt {
-    private final byte[] salt;
+    private transient final byte[] salt;
     private final int iterations = 100;
     private final SecretKey key;
     private final Cipher cipher;
