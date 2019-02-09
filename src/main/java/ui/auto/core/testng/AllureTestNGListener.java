@@ -41,28 +41,12 @@ public class AllureTestNGListener extends AllureTestListener {
 	}
 
 	private boolean isCandidateForRetry(ITestNGMethod method) {
-		// Annotation:  @Test
-		if (method.isTest()) {
-			return true;
-		}
 
-		// Annotation:  @BeforeTest
-		if (method.isBeforeTestConfiguration()) {
-			return true;
-		}
-
-		// Annotation:  @AfterTest
-		if (method.isAfterTestConfiguration()) {
-			return true;
-		}
-
-		// Annotation:  @BeforeMethod
-		if (method.isBeforeMethodConfiguration()) {
-			return true;
-		}
-
-		// Annotation:  @AfterMethod
-		return method.isAfterMethodConfiguration();
+		return method.isTest() ||
+				method.isBeforeTestConfiguration() ||
+				method.isAfterTestConfiguration() ||
+				method.isBeforeMethodConfiguration() ||
+				method.isAfterMethodConfiguration();
 
 	}
 

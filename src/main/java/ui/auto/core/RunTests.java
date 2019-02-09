@@ -20,7 +20,7 @@ public class RunTests {
     private final static Logger logger = LoggerFactory.getLogger(RunTests.class);
 
     private static boolean isRunningOnJenkins() {
-        return System.getenv("JENKINS_HOME") != null;
+        return System.getenv().containsKey("JENKINS_HOME");
     }
 
     public static void main(String[] args) throws Exception {
