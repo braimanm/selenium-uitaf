@@ -13,10 +13,9 @@ import ui.auto.core.testng.TestNGBase;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 public class Helper {
 
@@ -30,12 +29,11 @@ public class Helper {
     }
 
     public static FluentWait<WebDriver> getFluentWait() {
-        TestProperties props = TestContext.getTestProperties();
-        return new FluentWait<>(getWebDriver()).withTimeout(props.getElementTimeout(), TimeUnit.SECONDS);
+        return getFluentWait(TestContext.getTestProperties().getElementTimeout());
     }
 
     public static FluentWait<WebDriver> getFluentWait(int timeOutInSeconds) {
-        return new FluentWait<>(getWebDriver()).withTimeout(timeOutInSeconds, TimeUnit.SECONDS);
+        return new FluentWait<>(getWebDriver()).withTimeout(Duration.ofSeconds(timeOutInSeconds));
     }
 
 
@@ -88,16 +86,6 @@ public class Helper {
         return wait.ignoring(NoSuchElementException.class).until(ExpectedConditions.visibilityOfNestedElementsLocatedBy(parent, child)).get(0);
     }
 
-    private static Function<WebDriver, Boolean> isAjaxReady() {
-
-        return webDriver -> {
-            JavascriptExecutor driver = (JavascriptExecutor) webDriver;
-            long ang = (long) driver.executeScript("return window.angular.element('body').injector().get('$http').pendingRequests.length;");
-            long jq = (long) driver.executeScript("return window.jQuery.active;");
-            return ((ang + jq) == 0);
-        };
-    }
-
     //This method will not throw exception during validation
     public static boolean isDispalyed(PageComponent component) {
         List<WebElement> elList = getWebDriver().findElements(component.getLocator());
@@ -129,33 +117,33 @@ public class Helper {
 
     public static void waitForXHR() {
         TestProperties props = TestContext.getTestProperties();
-        waitForXHR(props.getElementTimeout() * 1000, 500);
+        waitForXHR(props.getElementTimeout() * 1000, 500, false);
     }
 
-    public static void waitForXHR(long timeout, long sleep) {
+    public static void waitForXHR(long timeout, long sleep, boolean debug) {
         String script = "function reqCallBack(t){document.getElementsByTagName('body')[0].setAttribute('ajaxcounter',++ajaxCount)}function resCallback(t){document.getElementsByTagName('body')[0].setAttribute('ajaxcounter',--ajaxCount)}function intercept(){XMLHttpRequest.prototype.send=function(){if(reqCallBack(this),this.addEventListener){var t=this;this.addEventListener('readystatechange',function(){4===t.readyState&&resCallback(t)},!1)}else{var e=this.onreadystatechange;e&&(this.onreadystatechange=function(){4===t.readyState&&resCallbck(this),e()})}originalXhrSend.apply(this,arguments)}}var originalXhrSend=XMLHttpRequest.prototype.send,ajaxCount=0;document.getElementsByTagName('body')[0].hasAttribute('ajaxcounter')||intercept();";
         JavascriptExecutor driver = (JavascriptExecutor) getWebDriver();
         driver.executeScript(script);
 
         long to = System.currentTimeMillis() + timeout;
         boolean flag = true;
-        System.out.print("XHR: ");
+        if (debug) System.out.print("XHR: ");
         do {
             String val = getWebDriver().findElement(By.cssSelector("body")).getAttribute("ajaxcounter");
             if (val == null) {
                 val = "-1";
                 if (System.currentTimeMillis() > (to - timeout + 2000)) {
-                    System.out.println();
+                    if (debug) System.out.println();
                     return;
                 }
             }
-            System.out.print(val + " ");
+            if (debug) System.out.print(val + " ");
             if (Integer.valueOf(val) == 0) {
                 flag = false;
             }
             if (flag) sleep(sleep);
         } while (flag && System.currentTimeMillis() < to);
-        System.out.println();
+        if (debug) System.out.println();
     }
 
 }
