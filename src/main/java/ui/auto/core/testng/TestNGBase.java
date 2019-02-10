@@ -10,10 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Listeners;
+import org.testng.annotations.*;
 import ru.yandex.qatools.allure.Allure;
 import ru.yandex.qatools.allure.events.MakeAttachmentEvent;
 import ui.auto.core.context.PageComponentContext;
@@ -107,23 +104,56 @@ public class TestNGBase {
 		}
 	}
 
-	@BeforeTest
-	public void initTest(ITestContext testNgContext){
-		if (TestNGBase.testNgContext.get() == null) {
-			TestNGBase.testNgContext.set(testNgContext);
-		}
-		time = System.currentTimeMillis();
-	}
+    protected void initTest(ITestContext testNgContext) {
+        time = System.currentTimeMillis();
+        if (TestNGBase.testNgContext.get() == null) {
+            TestNGBase.testNgContext.set(testNgContext);
+        }
 
-	@AfterTest(alwaysRun = true)
-	public void closeDriver(){
-		time = (System.currentTimeMillis() - time) / 1000;
+    }
+
+    protected void closeDriver(ITestContext testNgContext) {
+        time = (System.currentTimeMillis() - time) / 1000;
         if (CONTEXT().getDriver() != null) {
             logInfo("-CLOSING CONTEXT: " + CONTEXT().getDriver().toString());
             CONTEXT().getDriver().quit();
-		}
-		context.remove();
-	}
+        }
+        context.remove();
+    }
+
+    @BeforeTest
+    public void beforeTest(ITestContext testNgContext) {
+        String parallel = testNgContext.getSuite().getParallel();
+        if (parallel.equals("tests") || parallel.equals("none")) initTest(testNgContext);
+    }
+
+    @AfterTest
+    public void afterTest(ITestContext testNgContext) {
+        String parallel = testNgContext.getSuite().getParallel();
+        if (parallel.equals("tests") || parallel.equals("none")) closeDriver(testNgContext);
+    }
+
+    @BeforeMethod
+    public void beforeMethod(ITestContext testNgContext) {
+        if (testNgContext.getSuite().getParallel().equals("methods")) initTest(testNgContext);
+    }
+
+    @AfterMethod
+    public void afterMethod(ITestContext testNgContext) {
+        if (testNgContext.getSuite().getParallel().equals("methods")) closeDriver(testNgContext);
+    }
+
+    @BeforeClass
+    public void beforeClass(ITestContext testNgContext) {
+        String parallel = testNgContext.getSuite().getParallel();
+        if (parallel.equals("classes") || parallel.equals("instances")) initTest(testNgContext);
+    }
+
+    @AfterClass
+    public void afterClass(ITestContext testNgContext) {
+        String parallel = testNgContext.getSuite().getParallel();
+        if (parallel.equals("classes") || parallel.equals("instances")) closeDriver(testNgContext);
+    }
 
 	protected void setAttribute(String alias,Object value){
 		testNgContext.get().getSuite().setAttribute(alias, value);
