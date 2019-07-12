@@ -1,5 +1,5 @@
-## selenium-uitaf
-# Minimalistic selenium based UI testing framework with page-component open source project and Allure reporting.
+# selenium-uitaf
+## Minimalistic selenium based UI testing framework with page-component open source project and Allure reporting.
 
 * UITAF (UI Test Automation Framework) is another attempt to make life of automation developers easier by providing concise test automation development approach with automatic generation of test data-sets from page-objects and generation of detailed report at the end of the test execution. 
 
