@@ -27,7 +27,7 @@
 
 # Test Automation Components (Page Components)
 
-UITAF is designed around the usage of Test Automation Components and I'll try to eplain what they are. 
+UITAF is designed around the usage of Test Automation Components and I'll try to explain what they are. 
 Here is an example of a Test Automation Components for testing simple application consisting of two Web pages: Page1 and Page2.
 
 ![image](https://user-images.githubusercontent.com/7651167/61152108-8cd02d80-a4b5-11e9-9fe0-14a8bb024f74.png)
