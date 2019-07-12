@@ -9,3 +9,6 @@
 
 * UITAF seamlessly integrates with continuous integration systems allowing easy configuration for running the tests jobs against multiple environments, it also has capability to embed test report with any job run by hosting the report on the CI server.  
 
+## The following Diagram shows the architecture of the UITAF: 
+
+![image](https://user-images.githubusercontent.com/7651167/61151451-f7806980-a4b3-11e9-8e34-002d7c7458ad.png)
