@@ -1,5 +1,8 @@
 package ui.auto.core.support;
 
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
@@ -33,7 +36,10 @@ public enum WebDriverTypeEnum {
     FIREFOX(BrowserType.FIREFOX),
     IE(BrowserType.IE),
     OPERA_BLINK(BrowserType.OPERA_BLINK),
-    SAFARI(BrowserType.SAFARI);
+    SAFARI(BrowserType.SAFARI),
+    ANDROID(BrowserType.ANDROID),
+    IPHONE(BrowserType.IPHONE),
+    IPAD(BrowserType.IPAD);
 
     String driverName;
 
@@ -71,6 +77,14 @@ public enum WebDriverTypeEnum {
         return capabilities;
     }
 
+    private DesiredCapabilities getMobileCapabilities(Platform platformName) {
+        TestProperties prop = TestContext.getTestProperties();
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, platformName);
+        capabilities.merge(prop.getExtraCapabilities());
+        return capabilities;
+    }
+
     private WebDriver getRemoteWebDriver(String url, MutableCapabilities capabilities) {
         try {
             return new RemoteWebDriver(new URL(url), capabilities);
@@ -81,6 +95,17 @@ public enum WebDriverTypeEnum {
 
     public String getDriverName() {
         return driverName;
+    }
+
+    private URL getRemoteUrl() {
+        TestProperties prop = TestContext.getTestProperties();
+        URL url;
+        try {
+            url = new URL(prop.getRemoteURL());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("webdriver.remote.url property has invalid value!");
+        }
+        return url;
     }
 
     public WebDriver getNewWebDriver(Consumer<MutableCapabilities> capabilities) {
@@ -167,6 +192,12 @@ public enum WebDriverTypeEnum {
                     return new OperaDriver(operaOptions);
                 }
 
+            case ANDROID:
+                return new AndroidDriver(getRemoteUrl(), getMobileCapabilities(Platform.ANDROID));
+
+            case IPHONE:
+            case IPAD:
+                return new IOSDriver(getRemoteUrl(), getMobileCapabilities(Platform.IOS));
         }
         return null;
     }
