@@ -52,3 +52,13 @@ In case of dynamic data which needs to be provided at test execution run-time, a
 "Domain Object" design pattern is a design pattern introduced and supported by UITAF, it's very similar to "Page Object" design pattern but instead of being Page oriented the "Domain Object" is strictly business oriented. Domain Object is used when you have business logic which is spanning across multiple web pages (or Page Objects). Fields of Domain Object classes are of PageObject types and they expose business methods related to business processes. In our example "Domain Object 1" Domain Object consists of two Page Objects which are needed to complete hypothetical "Submit Request" business method.
 
 Using all aforementioned UITAF mechanisms and design patterns automation developer can write real business oriented automation test cases which are readable and understandable by any technical or business oriented stakeholder for any existing and future projects.
+
+* #### Maven Dependency
+This open source project is distributed through maven central repository. Here is a Maven dependency for UITAF project.
+```
+<dependency>
+  <groupId>com.googlecode.page-component</groupId>
+  <artifactId>ui_auto_core</artifactId>
+  <version>2.5.3</version>
+</dependency>
+```
