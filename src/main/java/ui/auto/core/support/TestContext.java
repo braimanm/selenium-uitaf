@@ -27,7 +27,7 @@ public class TestContext extends PageComponentContext {
 
     public void init(Consumer<MutableCapabilities> capabilities) {
         if (driver != null) return;
-        driver = getTestProperties().getBrowserType().getNewWebDriver(capabilities);
+        driver = getTestProperties().getDriverProvider().getNewDriverInstance();
 		String res = getTestProperties().getScreenSize();
 		if (res != null) {
 			String[] resWH = res.toLowerCase().split("x");

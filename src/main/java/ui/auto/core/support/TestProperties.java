@@ -41,6 +41,9 @@ public class TestProperties {
 	@Hide
 	@Property("webdriver.browser.version")
 	private String version;
+	@Use(DriverProviderConverter.class)
+	@Property("driver.provider")
+	private DriverProvider driverProvider = new DefaultDriverProvider();
 	@Use(BrowserTypePropertyConverter.class)
 	@Property("webdriver.browser.type")
 	private WebDriverTypeEnum browserType = WebDriverTypeEnum.FIREFOX;
@@ -239,6 +242,9 @@ public class TestProperties {
 	}
 	public boolean installDrivers() {
 		return installDrivers;
+	}
+	public DriverProvider getDriverProvider() {
+		return driverProvider;
 	}
 
 }
