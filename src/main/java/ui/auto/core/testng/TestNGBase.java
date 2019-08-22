@@ -185,7 +185,10 @@ public class TestNGBase {
 		if (msg.startsWith(("-CLOSING"))) {
 			log.append("\nCOMPLETED AT:  ").append(new Date());
 			log.append("\nTEST DURATION: ").append(time).append(" seconds");
-			if (testNgContext.get().getFailedTests().size() > 0 || testNgContext.get().getFailedConfigurations().size() > 0) {
+			boolean testsArePassed = testNgContext.get().getPassedTests().size() > 0;
+			boolean testsAreFailed = testNgContext.get().getFailedTests().size() > 0;
+			boolean configsAreFailed = testNgContext.get().getFailedConfigurations().size() > 0;
+			if (testsAreFailed || configsAreFailed || !testsArePassed) {
 				log.append(getFailedConfigOrTests(testNgContext.get().getFailedConfigurations().getAllResults()));
 				log.append(getFailedConfigOrTests(testNgContext.get().getFailedTests().getAllResults()));
 			} else {
