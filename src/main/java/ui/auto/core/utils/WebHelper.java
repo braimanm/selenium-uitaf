@@ -70,7 +70,8 @@ public class WebHelper {
         boolean flag = true;
         if (debug) System.out.print("XHR: ");
         do {
-            String val = getWebDriver().findElement(By.cssSelector("body")).getAttribute("ajaxcounter");
+            List<WebElement> vals = getWebDriver().findElements(By.cssSelector("body"));
+            String val = (vals.isEmpty()) ? null :  vals.get(0).getAttribute("ajaxcounter");
             if (val == null) {
                 val = "-1";
                 if (System.currentTimeMillis() > (to - timeout + 2000)) {
