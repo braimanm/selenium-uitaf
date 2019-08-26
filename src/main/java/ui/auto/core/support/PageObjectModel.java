@@ -62,7 +62,7 @@ public class PageObjectModel extends PageObject {
         }
     }
 
-    private List<Label> getLables(DataPersistence data, String labelAlias, LabelName labelName) {
+    private List<Label> getLabels(DataPersistence data, String labelAlias, LabelName labelName) {
         DataAliases aliases = data.getDataAliases();
         String label = aliases.get(labelAlias);
         List<Label> labels = new ArrayList<>();
@@ -81,11 +81,11 @@ public class PageObjectModel extends PageObject {
         String description = aliases.get("test-description");
 
         List<Label> labels = new ArrayList<>();
-        labels.addAll(getLables(data, "test-features", LabelName.FEATURE));
-        labels.addAll(getLables(data, "test-stories", LabelName.STORY));
-        labels.addAll(getLables(data, "test-issues", LabelName.ISSUE));
-        labels.addAll(getLables(data, "test-IDs", LabelName.TEST_ID));
-        labels.addAll(getLables(data, "test-severity", LabelName.SEVERITY));
+        labels.addAll(getLabels(data, "test-features", LabelName.FEATURE));
+        labels.addAll(getLabels(data, "test-stories", LabelName.STORY));
+        labels.addAll(getLabels(data, "test-issues", LabelName.ISSUE));
+        labels.addAll(getLabels(data, "test-IDs", LabelName.TEST_ID));
+        labels.addAll(getLabels(data, "test-severity", LabelName.SEVERITY));
 
         Allure.LIFECYCLE.fire((TestCaseEvent) context -> {
             context.getLabels().addAll(labels);
