@@ -12,6 +12,7 @@ import ru.yandex.qatools.allure.model.Label;
 import ru.yandex.qatools.allure.model.LabelName;
 import ui.auto.core.context.PageComponentContext;
 import ui.auto.core.pagecomponent.PageObject;
+import ui.auto.core.pagecomponent.SkipAutoFill;
 import ui.auto.core.testng.TestNGBase;
 
 import java.time.LocalDateTime;
@@ -110,5 +111,23 @@ public class PageObjectModel extends PageObject {
         Allure.LIFECYCLE.fire(ev);
         return data;
     }
+
+    @Override
+    protected void autoFillPage(boolean validate) {
+        if (context == null) throw new RuntimeException("PageObject is not initialized, invoke initPage method!");
+        enumerateFields((pageComponent, field) -> {
+            if (!field.isAnnotationPresent(SkipAutoFill.class))
+                setElementValue(pageComponent, validate);
+                if (pageComponent != null && pageComponent.getData() != null) {
+                    String fieldName = field.getName();
+                    if (field.isAnnotationPresent(FieldName.class)) {
+                        fieldName = field.getAnnotation(FieldName.class).value();
+                    }
+                    reportForAutoFill(fieldName, pageComponent.getData());
+                }
+        });
+    }
+
+    protected void reportForAutoFill(String fieldName, String value) {}
 
 }
