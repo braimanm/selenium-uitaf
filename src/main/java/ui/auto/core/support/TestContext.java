@@ -1,12 +1,8 @@
 package ui.auto.core.support;
 
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import ui.auto.core.context.PageComponentContext;
-
-import java.util.function.Consumer;
-
 
 @SuppressWarnings("unused")
 public class TestContext extends PageComponentContext {
@@ -25,7 +21,7 @@ public class TestContext extends PageComponentContext {
 		return props.get();
 	}
 
-    public void init(Consumer<MutableCapabilities> capabilities) {
+    public void init() {
         if (driver != null) return;
         driver = getTestProperties().getDriverProvider().getNewDriverInstance();
 		String res = getTestProperties().getScreenSize();
@@ -45,7 +41,6 @@ public class TestContext extends PageComponentContext {
 	public void setAlias(String key,String value) {
 		getGlobalAliases().put(key, value);
 	}
-
 
 	private void setTimeouts() {
 		if (getTestProperties().getElementTimeout()>0) {

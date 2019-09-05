@@ -3,7 +3,6 @@ package ui.auto.core.testng;
 import datainstiller.data.DataAliases;
 import datainstiller.data.DataPersistence;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Set;
-import java.util.function.Consumer;
 
 @Listeners({AllureTestNGListener.class})
 public class TestNGBase {
@@ -51,12 +49,8 @@ public class TestNGBase {
 	}
 
     public TestContext getContext() {
-        return getContext(null);
-    }
-
-    public TestContext getContext(Consumer<MutableCapabilities> capabilities) {
         if (CONTEXT().getDriver() == null) {
-            CONTEXT().init(capabilities);
+            CONTEXT().init();
             logInfo("+INITIALIZING CONTEXT: " + CONTEXT().getDriver().toString());
         }
         return CONTEXT();
