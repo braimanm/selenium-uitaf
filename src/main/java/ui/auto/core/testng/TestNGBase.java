@@ -15,6 +15,7 @@ package ui.auto.core.testng;
 
 import datainstiller.data.DataAliases;
 import datainstiller.data.DataPersistence;
+import io.appium.java_client.MobileDriver;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -47,17 +48,23 @@ public class TestNGBase {
 
 	public synchronized static void takeScreenshot(String title) {
         if (CONTEXT().getDriver() != null) {
-            byte[] attachment = ((TakesScreenshot) CONTEXT().getDriver()).getScreenshotAs(OutputType.BYTES);
-			MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, title, "image/png");
-			Allure.LIFECYCLE.fire(ev);
+        	try {
+				byte[] attachment = ((TakesScreenshot) CONTEXT().getDriver()).getScreenshotAs(OutputType.BYTES);
+				MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, title, "image/png");
+				Allure.LIFECYCLE.fire(ev);
+			} catch (Exception ignore) {}
 		}
 	}
 
 	public synchronized static void takeHTML(String title) {
         if (CONTEXT().getDriver() != null) {
-            byte[] attachment = (CONTEXT().getDriver().getPageSource()).getBytes();
-			MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, title, "text/html");
-			Allure.LIFECYCLE.fire(ev);
+        	if (!MobileDriver.class.isAssignableFrom(CONTEXT().getDriver().getClass())) {
+        		try {
+					byte[] attachment = (CONTEXT().getDriver().getPageSource()).getBytes();
+					MakeAttachmentEvent ev = new MakeAttachmentEvent(attachment, title, "text/html");
+					Allure.LIFECYCLE.fire(ev);
+				} catch (Exception ignore) {}
+			}
 		}
 	}
 
