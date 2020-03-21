@@ -32,6 +32,8 @@ public class EnvironmentsSetup extends DataPersistence {
         @XStreamAsAttribute
         String url;
         @XStreamImplicit
+        List<Property> custom;
+        @XStreamImplicit
         List<User> users;
 
         public String getEnvironmentName() {
@@ -58,6 +60,15 @@ public class EnvironmentsSetup extends DataPersistence {
             return users;
         }
 
+        public String getCustom(String name) {
+            for (Property p : custom) {
+                if (p.name.equals(name)) {
+                    return p.value;
+                }
+            }
+            throw new RuntimeException("Property \"" + name  + "\" was not found in environments configuration file");
+
+        }
     }
 
     @XStreamAlias("user")
@@ -70,6 +81,8 @@ public class EnvironmentsSetup extends DataPersistence {
         String userName;
         @XStreamAsAttribute
         String password;
+        @XStreamImplicit
+        List<Property> custom;
 
         public String getRole() {
             return role.toLowerCase();
@@ -86,6 +99,16 @@ public class EnvironmentsSetup extends DataPersistence {
         public String getPassword() {
             return password;
         }
+
+        public String getCustom(String name) {
+            for (Property p : custom) {
+                if (p.name.equals(name)) {
+                    return p.value;
+                }
+            }
+            throw new RuntimeException("Property \"" + name  + "\" was not found for user " + role + " in configuration file");
+
+        }
     }
 
     public Environment getEnvironment(String env) {
@@ -95,6 +118,22 @@ public class EnvironmentsSetup extends DataPersistence {
             }
         }
         throw new RuntimeException("Environment \"" + env + "\" was not found in environments configuration file");
+    }
+
+    @XStreamAlias("prop")
+    public static class Property {
+        @XStreamAsAttribute
+        String name;
+        @XStreamAsAttribute
+        String value;
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
 }
