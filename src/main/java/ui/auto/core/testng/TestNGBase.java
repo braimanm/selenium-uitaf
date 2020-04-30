@@ -68,7 +68,8 @@ public class TestNGBase {
 		}
 	}
 
-    public TestContext getContext() {
+    @SuppressWarnings("unused")
+	public TestContext getContext() {
         if (CONTEXT().getDriver() == null) {
             CONTEXT().init();
             logInfo("+INITIALIZING CONTEXT: " + CONTEXT().getDriver().toString());
@@ -126,7 +127,7 @@ public class TestNGBase {
 
     }
 
-    protected void closeDriver(ITestContext testNgContext) {
+    protected void closeDriver() {
         time = (System.currentTimeMillis() - time) / 1000;
         if (CONTEXT().getDriver() != null) {
             logInfo("-CLOSING CONTEXT: " + CONTEXT().getDriver().toString());
@@ -144,7 +145,7 @@ public class TestNGBase {
     @AfterTest
     public void afterTest(ITestContext testNgContext) {
         String parallel = testNgContext.getSuite().getParallel();
-        if (parallel.equals("tests") || parallel.equals("none")) closeDriver(testNgContext);
+        if (parallel.equals("tests") || parallel.equals("none")) closeDriver();
     }
 
     @BeforeMethod
@@ -154,7 +155,7 @@ public class TestNGBase {
 
     @AfterMethod
     public void afterMethod(ITestContext testNgContext) {
-        if (testNgContext.getSuite().getParallel().equals("methods")) closeDriver(testNgContext);
+        if (testNgContext.getSuite().getParallel().equals("methods")) closeDriver();
     }
 
     @BeforeClass
@@ -166,21 +167,21 @@ public class TestNGBase {
     @AfterClass
     public void afterClass(ITestContext testNgContext) {
         String parallel = testNgContext.getSuite().getParallel();
-        if (parallel.equals("classes") || parallel.equals("instances")) closeDriver(testNgContext);
+        if (parallel.equals("classes") || parallel.equals("instances")) closeDriver();
     }
 
-	protected void setAttribute(String alias,Object value){
+	@SuppressWarnings("unused")
+	protected void setAttribute(String alias, Object value){
 		testNgContext.get().getSuite().setAttribute(alias, value);
 	}
 
+	@SuppressWarnings("unused")
 	protected Object getAttribute(String alias){
 		return testNgContext.get().getSuite().getAttribute(alias);
 	}
 
 	private StringBuilder getFailedConfigOrTests(Set<ITestResult> results) {
 		StringBuilder log = new StringBuilder();
-		log.append(" ---> \u001B[31mTEST FAILED :(\u001B[0m");
-		log.append("\n");
 		for (ITestResult result : results) {
 			StringWriter stack = new StringWriter();
 			result.getThrowable().printStackTrace(new PrintWriter(new PrintWriter(stack)));
@@ -203,6 +204,7 @@ public class TestNGBase {
 			boolean testsAreFailed = testNgContext.get().getFailedTests().size() > 0;
 			boolean configsAreFailed = testNgContext.get().getFailedConfigurations().size() > 0;
 			if (testsAreFailed || configsAreFailed || !testsArePassed) {
+				log.append(" ---> \u001B[31mTEST FAILED :(\u001B[0m\n");
 				log.append(getFailedConfigOrTests(testNgContext.get().getFailedConfigurations().getAllResults()));
 				log.append(getFailedConfigOrTests(testNgContext.get().getFailedTests().getAllResults()));
 			} else {
