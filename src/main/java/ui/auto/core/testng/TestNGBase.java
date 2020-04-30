@@ -120,7 +120,7 @@ public class TestNGBase {
 
     protected void initTest(ITestContext testNgContext) {
         time = System.currentTimeMillis();
-        if (TestNGBase.testNgContext.get() == null) {
+        if (TestNGBase.testNgContext.get() == null || TestNGBase.testNgContext.get() != testNgContext) {
             TestNGBase.testNgContext.set(testNgContext);
         }
 
