@@ -28,7 +28,7 @@
 # Test Automation Components (Page Components)
 
 UITAF is designed around the usage of Test Automation Components and I'll try to explain what they are. 
-Here is an example of a Test Automation Components for testing simple application consisting of two Web pages: Page1 and Page2.
+In today’s web application technologies, webpages are composed from the JavaScript UI component libraries like AngularJS, React, jQuery UI, Ext JS, JSF PrimeFaces, and others. All these libraries use special templates composed by a collection of primitive HTML elements that acts as a single UI component and JavaScript code which encapsulates the logic of those components.
 
 ![image](https://user-images.githubusercontent.com/7651167/61152108-8cd02d80-a4b5-11e9-9fe0-14a8bb024f74.png)
 
