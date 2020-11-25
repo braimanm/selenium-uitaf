@@ -147,6 +147,9 @@ public class TestProperties {
 	public WebDriverTypeEnum getBrowserType() {
 		return browserType;
 	}
+	public void setBrowserType(WebDriverTypeEnum browserType) {
+		this.browserType=browserType;
+	}
 	public int getPageTimeout() {
 		return page_timeout;
 	}
@@ -223,7 +226,12 @@ public class TestProperties {
 			String params[] = extraCapabilities.split(",");
 			for (String param : params) {
 				String values[] = param.split("=", 2);
-				capabilities.setCapability(values[0].trim(), values[1].trim());
+				String key = values[0].trim();
+				String value = values[1].trim();
+				if (key.contains("securityToken") && System.getenv().keySet().contains("SEC_TOKEN")) {
+					value = System.getenv("SEC_TOKEN");
+				}
+				capabilities.setCapability(key, value);
 			}
 		}
 		return capabilities;

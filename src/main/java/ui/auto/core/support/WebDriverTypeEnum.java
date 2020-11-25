@@ -24,7 +24,8 @@ public enum WebDriverTypeEnum {
     SAFARI(BrowserType.SAFARI),
     ANDROID(BrowserType.ANDROID),
     IPHONE(BrowserType.IPHONE),
-    IPAD(BrowserType.IPAD);
+    IPAD(BrowserType.IPAD),
+    OVERWRITE("overwrite");
 
     String driverName;
 
