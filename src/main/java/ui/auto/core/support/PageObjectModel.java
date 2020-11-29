@@ -40,7 +40,7 @@ public class PageObjectModel extends PageObject {
     private void resolveGlobalAliasses() {
         DataAliases global = PageComponentContext.getGlobalAliases();
         for (String aliasKey : global.keySet()) {
-            String aliasValue = global.get(aliasKey);
+            String aliasValue = global.getAsString(aliasKey);
             if (aliasValue != null && aliasValue.matches(".*\\$\\{[\\w-]+}.*")) {
                 Pattern pat = Pattern.compile("\\$\\{[\\w-]+}");
                 Matcher mat = pat.matcher(aliasValue);
@@ -48,7 +48,7 @@ public class PageObjectModel extends PageObject {
                     String alias = mat.group();
                     String key = alias.replace("${", "").replace("}", "");
                     if (global.containsKey(key)) {
-                        String value = global.get(key);
+                        String value = global.getAsString(key);
                         if (value != null) {
                             aliasValue = aliasValue.replace(alias, value);
                         }
@@ -78,7 +78,7 @@ public class PageObjectModel extends PageObject {
 
     private List<Label> getLabels(DataPersistence data, String labelAlias, LabelName labelName) {
         DataAliases aliases = data.getDataAliases();
-        String label = aliases.get(labelAlias);
+        String label = aliases.getAsString(labelAlias);
         List<Label> labels = new ArrayList<>();
         if (label != null) {
             for (String value : label.split(",")) {
@@ -91,8 +91,8 @@ public class PageObjectModel extends PageObject {
     private void overwriteTestParameters(DataPersistence data) {
         DataAliases aliases = data.getDataAliases();
         if (aliases == null) return;
-        String name = aliases.get("test-name");
-        String description = aliases.get("test-description");
+        String name = aliases.getAsString("test-name");
+        String description = aliases.getAsString("test-description");
 
         List<Label> labels = new ArrayList<>();
         labels.addAll(getLabels(data, "test-features", LabelName.FEATURE));

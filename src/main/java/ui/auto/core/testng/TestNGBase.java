@@ -68,8 +68,7 @@ public class TestNGBase {
 		}
 	}
 
-    @SuppressWarnings("unused")
-	public TestContext getContext() {
+    public TestContext getContext() {
         if (CONTEXT().getDriver() == null) {
             CONTEXT().init();
             logInfo("+INITIALIZING CONTEXT: " + CONTEXT().getDriver().toString());
@@ -91,7 +90,7 @@ public class TestNGBase {
 		String xml = data.toXML().replace("<aliases/>","");
 		for (String key : aliases.keySet()){
 			String alias = "${" + key + "}";
-			String value = aliases.get(key);
+			String value = aliases.getAsString(key);
 			xml = xml.replace(alias, value);
 		}
 		return xml;
@@ -170,12 +169,10 @@ public class TestNGBase {
         if (parallel.equals("classes") || parallel.equals("instances")) closeDriver();
     }
 
-	@SuppressWarnings("unused")
 	protected void setAttribute(String alias, Object value){
 		testNgContext.get().getSuite().setAttribute(alias, value);
 	}
 
-	@SuppressWarnings("unused")
 	protected Object getAttribute(String alias){
 		return testNgContext.get().getSuite().getAttribute(alias);
 	}

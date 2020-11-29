@@ -17,7 +17,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import ui.auto.core.context.PageComponentContext;
 
-@SuppressWarnings("unused")
 public class TestContext extends PageComponentContext {
 	private static ThreadLocal<TestProperties> props = ThreadLocal.withInitial(TestProperties::new);
 
@@ -47,7 +46,7 @@ public class TestContext extends PageComponentContext {
 		}
 	}
 
-	public String getAlias(String key) {
+	public Object getAlias(String key) {
 		return getGlobalAliases().get(key);
 	}
 
