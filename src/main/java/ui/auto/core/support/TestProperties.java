@@ -162,7 +162,7 @@ public class TestProperties {
 		if (this.suites!=null){
 			String[] suites = this.suites.split(",");
 			for (String s : suites){
-				suitesList.add(s.trim().replace("\"","").replace("\'",""));
+				suitesList.add(s.trim().replace("\"","").replace("'",""));
 			}
 		}
 		return suitesList;
@@ -223,18 +223,26 @@ public class TestProperties {
 	public Capabilities getExtraCapabilities() {
 		DesiredCapabilities capabilities = new DesiredCapabilities();
 		if (extraCapabilities != null) {
-			String params[] = extraCapabilities.split(",");
+			String[] params = extraCapabilities.split(",");
 			for (String param : params) {
-				String values[] = param.split("=", 2);
+				String[] values = param.split("=", 2);
 				String key = values[0].trim();
 				String value = values[1].trim();
-				if (key.contains("securityToken") && System.getenv().keySet().contains("SEC_TOKEN")) {
+				if (key.contains("securityToken") && System.getenv().containsKey("SEC_TOKEN")) {
 					value = System.getenv("SEC_TOKEN");
 				}
 				capabilities.setCapability(key, value);
 			}
 		}
 		return capabilities;
+	}
+
+	public void setExtraCapabilities(String capabilities) {
+		this.extraCapabilities = capabilities;
+	}
+
+	public void replaceExtraCapabilities(String target, String replacement) {
+		extraCapabilities = extraCapabilities.replace(target, replacement);
 	}
 
 	public String getHttpProxy() {
