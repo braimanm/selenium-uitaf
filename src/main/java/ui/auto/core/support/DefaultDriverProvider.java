@@ -107,6 +107,7 @@ public class DefaultDriverProvider implements DriverProvider {
                 profile.setPreference("focusmanager.testmode", true);
                 FirefoxOptions firefoxOptions = new FirefoxOptions(desiredCapabilities);
                 firefoxOptions.setProfile(profile);
+                firefoxOptions.setHeadless(prop.getHeadless());
                 if (prop.getRemoteURL() != null) {
                     return getRemoteWebDriver(prop.getRemoteURL(), firefoxOptions);
                 } else {
@@ -116,6 +117,14 @@ public class DefaultDriverProvider implements DriverProvider {
             case CHROME:
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.merge(desiredCapabilities);
+                if (prop.getHeadless()) {
+                    chromeOptions.setHeadless(true);
+                    String res = prop.getScreenSize();
+                    if (res != null) {
+                        res = res.toLowerCase().trim().replace("x", ",");
+                        chromeOptions.addArguments("window-size=" + res);
+                    }
+                }
                 if (prop.getRemoteURL() != null) {
                     return getRemoteWebDriver(prop.getRemoteURL(), chromeOptions);
                 } else {
@@ -157,11 +166,11 @@ public class DefaultDriverProvider implements DriverProvider {
                 }
 
             case ANDROID:
-                return new AndroidDriver(getRemoteUrl(), getMobileCapabilities(Platform.ANDROID));
+                return new AndroidDriver<>(getRemoteUrl(), getMobileCapabilities(Platform.ANDROID));
 
             case IPHONE:
             case IPAD:
-                return new IOSDriver(getRemoteUrl(), getMobileCapabilities(Platform.IOS));
+                return new IOSDriver<>(getRemoteUrl(), getMobileCapabilities(Platform.IOS));
         }
         return null;
     }

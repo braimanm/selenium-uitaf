@@ -61,6 +61,8 @@ public class TestProperties {
 	@Use(BrowserTypePropertyConverter.class)
 	@Property("webdriver.browser.type")
 	private WebDriverTypeEnum browserType = WebDriverTypeEnum.FIREFOX;
+	@Property("webdriver.headless")
+	private boolean headless;
 	@Hide
 	@Property("webdriver.extra.capabilities")
 	private String extraCapabilities;
@@ -285,6 +287,9 @@ public class TestProperties {
 			driversList.add(DriverManagerType.valueOf(driver.trim().toUpperCase()));
 		}
 		return driversList;
+	}
+	public boolean getHeadless() {
+		return headless;
 	}
 
 }
