@@ -16,6 +16,8 @@ package ui.auto.core.testng;
 import datainstiller.data.DataAliases;
 import datainstiller.data.DataPersistence;
 import io.appium.java_client.MobileDriver;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import io.github.bonigarcia.wdm.config.DriverManagerType;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -28,11 +30,11 @@ import ru.yandex.qatools.allure.Allure;
 import ru.yandex.qatools.allure.events.MakeAttachmentEvent;
 import ui.auto.core.context.PageComponentContext;
 import ui.auto.core.support.TestContext;
-import ui.auto.core.utils.WebDriverInstaller;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Listeners({AllureTestNGListener.class})
@@ -68,7 +70,8 @@ public class TestNGBase {
 		}
 	}
 
-    public TestContext getContext() {
+    @SuppressWarnings("unused")
+	public TestContext getContext() {
         if (CONTEXT().getDriver() == null) {
             CONTEXT().init();
             logInfo("+INITIALIZING CONTEXT: " + CONTEXT().getDriver().toString());
@@ -102,16 +105,14 @@ public class TestNGBase {
 		Allure.LIFECYCLE.fire(ev);
 	}
 
-	private void setUpDrivers() {
-		WebDriverInstaller installer = new WebDriverInstaller();
-		installer.installDriver("geckodriver", "webdriver.gecko.driver");
-		installer.installDriver("chromedriver", "webdriver.chrome.driver");
+	protected void installDrivers() {
+		List<DriverManagerType> drivers = TestContext.getTestProperties().getDriversToInstall();
+		drivers.forEach(driver -> WebDriverManager.getInstance(driver).setup());
 	}
-
 
 	@BeforeSuite
 	public void initSuite(ITestContext testNgContext) {
-		if (TestContext.getTestProperties().installDrivers()) setUpDrivers();
+		if (TestContext.getTestProperties().installDrivers()) installDrivers();
 		Integer threadCount = TestContext.getTestProperties().getThreadCount();
 		if (threadCount != null) {
 			testNgContext.getSuite().getXmlSuite().setThreadCount(threadCount);
@@ -123,7 +124,6 @@ public class TestNGBase {
         if (TestNGBase.testNgContext.get() == null || TestNGBase.testNgContext.get() != testNgContext) {
             TestNGBase.testNgContext.set(testNgContext);
         }
-
     }
 
     protected void closeDriver() {
@@ -169,10 +169,12 @@ public class TestNGBase {
         if (parallel.equals("classes") || parallel.equals("instances")) closeDriver();
     }
 
+	@SuppressWarnings("unused")
 	protected void setAttribute(String alias, Object value){
 		testNgContext.get().getSuite().setAttribute(alias, value);
 	}
 
+	@SuppressWarnings("unused")
 	protected Object getAttribute(String alias){
 		return testNgContext.get().getSuite().getAttribute(alias);
 	}
@@ -189,9 +191,9 @@ public class TestNGBase {
 
 	private void logInfo(String msg) {
 		StringBuilder log = new StringBuilder();
-		String delim = "\n" + StringUtils.repeat("=", msg.length());
+		String delimit = "\n" + StringUtils.repeat("=", msg.length());
 		log.append("ThreadId: ").append(Thread.currentThread().getId());
-		log.append(delim);
+		log.append(delimit);
 		log.append("\nTEST: ").append(getTestInfo());
 		log.append("\n").append(msg);
 		if (msg.startsWith(("-CLOSING"))) {
@@ -208,7 +210,7 @@ public class TestNGBase {
 				log.append(" ---> \u001B[32mTEST PASSED :)\u001B[0m");
 			}
 		}
-		log.append(delim).append("\n");
+		log.append(delimit).append("\n");
 		LOG.info(log.toString());
 	}
 

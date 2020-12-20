@@ -13,6 +13,7 @@ Copyright 2010-2019 Michael Braiman braimanm@gmail.com
 
 package ui.auto.core.support;
 
+import io.github.bonigarcia.wdm.config.DriverManagerType;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -89,6 +90,8 @@ public class TestProperties {
 	private int testDefaultRetry = 2;
 	@Property("webdriver.install")
 	private boolean installDrivers = false;
+	@Property("webdriver.drivers.to.install")
+	private String driversToInstall = "CHROME,FIREFOX";
 	@Hide
 	@Property("report.tms.url")
 	private String tmsUrlPattern;
@@ -274,6 +277,14 @@ public class TestProperties {
 	}
 	public DriverProvider getDriverProvider() {
 		return driverProvider;
+	}
+	public List<DriverManagerType> getDriversToInstall() {
+		List<DriverManagerType> driversList = new ArrayList<>();
+		String[] drivers = driversToInstall.split(",");
+		for (String driver : drivers) {
+			driversList.add(DriverManagerType.valueOf(driver.trim().toUpperCase()));
+		}
+		return driversList;
 	}
 
 }

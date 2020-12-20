@@ -43,6 +43,7 @@
         <testNg.version>6.14.3</testNg.version>
         <apache.commons.version>3.8.1</apache.commons.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <webdrivermanager_version>4.2.2</webdrivermanager_version>
     </properties>
 
 
@@ -95,6 +96,13 @@
             <artifactId>commons-lang3</artifactId>
             <version>${apache.commons.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>${webdrivermanager_version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
