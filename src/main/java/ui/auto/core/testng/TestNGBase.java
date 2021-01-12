@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings({"unused", "SameParameterValue"})
 @Listeners({AllureTestNGListener.class})
 public class TestNGBase {
 	private static final ThreadLocal<TestContext> context = ThreadLocal.withInitial(TestContext::new);
@@ -70,11 +71,12 @@ public class TestNGBase {
 		}
 	}
 
-    @SuppressWarnings("unused")
 	public TestContext getContext() {
         if (CONTEXT().getDriver() == null) {
             CONTEXT().init();
-            logInfo("+INITIALIZING CONTEXT: " + CONTEXT().getDriver().toString());
+			String driverInfo = CONTEXT().getDriver().toString();
+			setAttribute("driver-info", driverInfo);
+			logInfo("+INITIALIZING CONTEXT: " + driverInfo );
         }
         return CONTEXT();
     }
@@ -126,57 +128,61 @@ public class TestNGBase {
         }
     }
 
-    protected void closeDriver() {
-        time = (System.currentTimeMillis() - time) / 1000;
-        if (CONTEXT().getDriver() != null) {
-            logInfo("-CLOSING CONTEXT: " + CONTEXT().getDriver().toString());
-            CONTEXT().getDriver().quit();
-        }
-        context.remove();
-    }
+	protected void closeDriver() {
+		if (CONTEXT().getDriver() != null) {
+			CONTEXT().getDriver().quit();
+		}
+		context.remove();
+	}
 
-    @BeforeTest
-    public void beforeTest(ITestContext testNgContext) {
-        String parallel = testNgContext.getSuite().getParallel();
-        if (parallel.equals("tests") || parallel.equals("none")) initTest(testNgContext);
-    }
+	private void closeDriverAfterTest() {
+		time = (System.currentTimeMillis() - time) / 1000;
+		String driverInfo = getAttribute("driver-info");
+		logInfo("-CLOSING CONTEXT: " + driverInfo);
+		closeDriver();
+	}
 
-    @AfterTest
-    public void afterTest(ITestContext testNgContext) {
-        String parallel = testNgContext.getSuite().getParallel();
-        if (parallel.equals("tests") || parallel.equals("none")) closeDriver();
-    }
+	@BeforeTest
+	public void beforeTest(ITestContext testNgContext) {
+		String parallel = testNgContext.getSuite().getParallel();
+		if (parallel.equals("tests") || parallel.equals("none")) initTest(testNgContext);
+	}
 
-    @BeforeMethod
-    public void beforeMethod(ITestContext testNgContext) {
-        if (testNgContext.getSuite().getParallel().equals("methods")) initTest(testNgContext);
-    }
+	@AfterTest
+	public void afterTest(ITestContext testNgContext) {
+		String parallel = testNgContext.getSuite().getParallel();
+		if (parallel.equals("tests") || parallel.equals("none")) closeDriverAfterTest();
+	}
 
-    @AfterMethod
-    public void afterMethod(ITestContext testNgContext) {
-        if (testNgContext.getSuite().getParallel().equals("methods")) closeDriver();
-    }
+	@BeforeMethod
+	public void beforeMethod(ITestContext testNgContext) {
+		if (testNgContext.getSuite().getParallel().equals("methods")) initTest(testNgContext);
+	}
 
-    @BeforeClass
-    public void beforeClass(ITestContext testNgContext) {
-        String parallel = testNgContext.getSuite().getParallel();
-        if (parallel.equals("classes") || parallel.equals("instances")) initTest(testNgContext);
-    }
+	@AfterMethod
+	public void afterMethod(ITestContext testNgContext) {
+		if (testNgContext.getSuite().getParallel().equals("methods")) closeDriverAfterTest();
+	}
 
-    @AfterClass
-    public void afterClass(ITestContext testNgContext) {
-        String parallel = testNgContext.getSuite().getParallel();
-        if (parallel.equals("classes") || parallel.equals("instances")) closeDriver();
-    }
+	@BeforeClass
+	public void beforeClass(ITestContext testNgContext) {
+		String parallel = testNgContext.getSuite().getParallel();
+		if (parallel.equals("classes") || parallel.equals("instances")) initTest(testNgContext);
+	}
 
-	@SuppressWarnings("unused")
+	@AfterClass
+	public void afterClass(ITestContext testNgContext) {
+		String parallel = testNgContext.getSuite().getParallel();
+		if (parallel.equals("classes") || parallel.equals("instances")) closeDriverAfterTest();
+	}
+
 	protected void setAttribute(String alias, Object value){
 		testNgContext.get().getSuite().setAttribute(alias, value);
 	}
 
-	@SuppressWarnings("unused")
-	protected Object getAttribute(String alias){
-		return testNgContext.get().getSuite().getAttribute(alias);
+	protected String getAttribute(String alias){
+		Object o = testNgContext.get().getSuite().getAttribute(alias);
+		return (o == null) ? "Not Found" : o.toString();
 	}
 
 	private StringBuilder getFailedConfigOrTests(Set<ITestResult> results) {
