@@ -16,6 +16,7 @@ package ui.auto.core.support;
 import datainstiller.data.DataAliases;
 import datainstiller.data.DataPersistence;
 import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.lang3.StringUtils;
 import ru.yandex.qatools.allure.Allure;
 import ru.yandex.qatools.allure.events.MakeAttachmentEvent;
 import ru.yandex.qatools.allure.events.TestCaseEvent;
@@ -129,15 +130,19 @@ public class PageObjectModel extends PageObject {
     protected void autoFillPage(boolean validate) {
         if (context == null) throw new RuntimeException("PageObject is not initialized, invoke initPage method!");
         enumerateFields((pageComponent, field) -> {
-            if (!field.isAnnotationPresent(SkipAutoFill.class))
+            if (!field.isAnnotationPresent(SkipAutoFill.class)) {
                 setElementValue(pageComponent, validate);
-                if (pageComponent != null && pageComponent.getData() != null) {
-                    String fieldName = field.getName();
+                if (pageComponent.getData() != null && !pageComponent.getData().isEmpty()) {
+                    String fieldName;
                     if (field.isAnnotationPresent(FieldName.class)) {
                         fieldName = field.getAnnotation(FieldName.class).value();
+                    } else {
+                        String[] parts = StringUtils.splitByCharacterTypeCamelCase(field.getName());
+                        fieldName = StringUtils.capitalize(StringUtils.join(parts, StringUtils.SPACE));
                     }
                     reportForAutoFill(fieldName, pageComponent.getData());
                 }
+            }
         });
     }
 
