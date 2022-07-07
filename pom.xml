@@ -39,7 +39,7 @@
         <compiler.version>1.8</compiler.version>
         <page-component.version>1.6.1</page-component.version>
         <allure.version>1.5.4</allure.version>
-        <jetty.version>9.4.44.v20210927</jetty.version>
+        <jetty.version>10.0.10</jetty.version>
         <testNg.version>6.14.3</testNg.version>
         <apache.commons.version>3.12.0</apache.commons.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
