@@ -1,11 +1,11 @@
 # selenium-uitaf
 ## Minimalistic selenium based UI testing framework with page-component open source project and Allure reporting.
 
-* UITAF (UI Test Automation Framework) is another attempt to make life of automation developers easier by providing concise test automation development approach with automatic generation of test data-sets from page-objects and generation of detailed report at the end of the test execution. 
+* UITAF (UI Test Automation Framework) is a tool or framework that is designed to make it easier for developers to create automated tests for user interfaces (UI). It provides a concise approach for developing automated tests, and it includes features such as the automatic generation of test data sets from page objects and the generation of a detailed report at the end of the test execution. The goal of UITAF is to make it easier and more efficient for developers to create and run automated tests for UI. 
 
-* The UITAF uses new approach for business oriented testing by introducing new design pattern called “domain-objects” where multiple web pages are involved across single business scenario.  
+* UITAF uses a new approach for business-oriented testing by introducing a design pattern called "domain-objects". This design pattern is intended to make it easier and more efficient to create automated tests for business processes where multiple web pages are involved across a single business scenario.
 
-* UITAF supports concurrency right out of the box by invoking multiple test cases using multiple supported browsers on the single machine, on the selenium grid or on Virtual Machines in the cloud.  
+* UITAF is designed to support concurrent testing. This means that it allows multiple test cases to be run at the same time using multiple supported browsers on a single machine, on a Selenium grid, or on virtual machines in the cloud. By providing this capability, UITAF aims to make it easier and more efficient for developers to perform concurrent testing of their UI. 
 
 * UITAF seamlessly integrates with continuous integration systems allowing easy configuration for running the tests jobs against multiple environments, it also has capability to embed test report with any job run by hosting the report on the CI server.  
 
