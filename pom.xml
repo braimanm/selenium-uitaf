@@ -40,7 +40,7 @@
         <page-component.version>1.6.1</page-component.version>
         <allure.version>1.5.4</allure.version>
         <jetty.version>9.4.44.v20210927</jetty.version>
-        <testNg.version>6.14.3</testNg.version>
+        <testNg.version>7.5.1</testNg.version>
         <apache.commons.version>3.12.0</apache.commons.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <webdrivermanager_version>5.0.2</webdrivermanager_version>
