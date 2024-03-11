@@ -24,7 +24,6 @@ import ru.yandex.qatools.allure.model.Description;
 import ru.yandex.qatools.allure.model.DescriptionType;
 import ru.yandex.qatools.allure.model.Label;
 import ru.yandex.qatools.allure.model.LabelName;
-import ui.auto.core.context.PageComponentContext;
 import ui.auto.core.pagecomponent.PageObject;
 import ui.auto.core.pagecomponent.SkipAutoFill;
 import ui.auto.core.testng.TestNGBase;
@@ -33,32 +32,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+
+@SuppressWarnings({"NewClassNamingConvention", "unused"})
 public class PageObjectModel extends PageObject {
-
-    private void resolveGlobalAliasses() {
-        DataAliases global = PageComponentContext.getGlobalAliases();
-        for (String aliasKey : global.keySet()) {
-            String aliasValue = global.getAsString(aliasKey);
-            if (aliasValue != null && aliasValue.matches(".*\\$\\{[\\w-]+}.*")) {
-                Pattern pat = Pattern.compile("\\$\\{[\\w-]+}");
-                Matcher mat = pat.matcher(aliasValue);
-                while (mat.find()) {
-                    String alias = mat.group();
-                    String key = alias.replace("${", "").replace("}", "");
-                    if (global.containsKey(key)) {
-                        String value = global.getAsString(key);
-                        if (value != null) {
-                            aliasValue = aliasValue.replace(alias, value);
-                        }
-                    }
-                }
-                global.put(aliasKey, aliasValue);
-            }
-        }
-    }
 
     @Override
     protected void initJexlContext(JexlContext jexlContext) {
@@ -116,7 +93,6 @@ public class PageObjectModel extends PageObject {
     @Override
     public <T extends DataPersistence> T fromResource(String resourceFilePath, boolean resolveAliases) {
         T data = super.fromResource(resourceFilePath, resolveAliases);
-        resolveGlobalAliasses();
         overwriteTestParameters(data);
         TestNGBase.attachDataSet(data, resourceFilePath);
 

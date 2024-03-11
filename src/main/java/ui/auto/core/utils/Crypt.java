@@ -12,6 +12,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
+@SuppressWarnings("unused")
 public class Crypt {
     private transient final byte[] salt;
     private final int iterations = 100;

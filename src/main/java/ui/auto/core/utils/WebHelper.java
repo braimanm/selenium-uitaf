@@ -16,19 +16,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class WebHelper {
 
     public static WebDriver getWebDriver() {
         return TestNGBase.CONTEXT().getDriver();
     }
 
-    public static WebDriverWait getWebDriiverWait() {
+    public static WebDriverWait getWebDriverWait() {
         TestProperties props = TestContext.getTestProperties();
         return new WebDriverWait(getWebDriver(), props.getElementTimeout());
     }
 
     //This method will not throw exception during validation
-    public static boolean isDispalyed(PageComponent component) {
+    public static boolean isDisplayed(PageComponent component) {
         List<WebElement> elList = getWebDriver().findElements(component.getLocator());
         if (elList.isEmpty()) {
             return false;
@@ -58,7 +59,7 @@ public class WebHelper {
 
     public static void waitForXHR() {
         TestProperties props = TestContext.getTestProperties();
-        waitForXHR(props.getElementTimeout() * 1000, 500, false);
+        waitForXHR(props.getElementTimeout() * 1000L, 500, false);
     }
 
     public static void waitForXHR(long timeout, long sleep, boolean debug) {
@@ -80,7 +81,7 @@ public class WebHelper {
                 }
             }
             if (debug) System.out.print(val + " ");
-            if (Integer.valueOf(val) == 0) {
+            if (Integer.parseInt(val) == 0) {
                 flag = false;
             }
             if (flag) sleep(sleep);

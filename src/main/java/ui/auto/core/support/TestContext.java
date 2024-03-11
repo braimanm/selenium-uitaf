@@ -46,14 +46,6 @@ public class TestContext extends PageComponentContext {
 		}
 	}
 
-	public Object getAlias(String key) {
-		return getGlobalAliases().get(key);
-	}
-
-	public void setAlias(String key,String value) {
-		getGlobalAliases().put(key, value);
-	}
-
 	private void setTimeouts() {
 		if (getTestProperties().getElementTimeout()>0) {
 			setAjaxTimeOut(getTestProperties().getElementTimeout());
