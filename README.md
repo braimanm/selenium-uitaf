@@ -59,6 +59,6 @@ This open source project is distributed through maven central repository. Here i
 <dependency>
   <groupId>com.googlecode.page-component</groupId>
   <artifactId>ui_auto_core</artifactId>
-  <version>2.5.16</version>
+  <version>2.7.1</version>
 </dependency>
 ```
