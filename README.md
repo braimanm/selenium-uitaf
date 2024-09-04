@@ -11,7 +11,7 @@
 
 ## The following Diagram shows the architecture of the UITAF: 
 
-![uitaf_architecture](https://github.com/user-attachments/assets/570aaa17-cba3-4c34-ac43-4cba810db72d)
+![uitaf_architecture](https://github.com/user-attachments/assets/81abb88e-6f87-46f2-b45a-9eadcdbb5e34)
 
 *	**Selenium WebDriver** API drives the Web Browser to simulate user actions on the Web Application under the Test.
 *	**Web Page Components** comprise library of reusable components which encapsulate knowledge of how to operate and test underlying HTML composite component. Automation developer can declare and use those components in Page Objects without dealing with complexity of underlying UI technology. Page Components are highly reusable and mostly developed using Selenium WebDriver API.
