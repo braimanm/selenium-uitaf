@@ -1,6 +1,8 @@
 # selenium-uitaf
 ## Minimalistic selenium based UI testing framework with page-component open source project and Allure reporting.
 
+Please read our comprehensive documentation located at [https://uitaf.org](https://uitaf.org).
+
 * UITAF (UI Test Automation Framework) is a tool or framework that is designed to make it easier for developers to create automated tests for user interfaces (UI). It provides a concise approach for developing automated tests, and it includes features such as the automatic generation of test data sets from page objects and the generation of a detailed report at the end of the test execution. The goal of UITAF is to make it easier and more efficient for developers to create and run automated tests for UI. 
 
 * UITAF uses a new approach for business-oriented testing by introducing a design pattern called "domain-objects". This design pattern is intended to make it easier and more efficient to create automated tests for business processes where multiple web pages are involved across a single business scenario.
@@ -62,3 +64,4 @@ This open source project is distributed through maven central repository. Here i
   <version>2.7.1</version>
 </dependency>
 ```
+[Read the docs](https://uitaf.org) for any further information.
