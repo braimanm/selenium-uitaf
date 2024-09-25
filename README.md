@@ -59,9 +59,9 @@ Using all aforementioned UITAF mechanisms and design patterns automation develop
 This open source project is distributed through maven central repository. Here is a Maven dependency for UITAF project.
 ```
 <dependency>
-  <groupId>com.googlecode.page-component</groupId>
-  <artifactId>ui_auto_core</artifactId>
-  <version>2.7.1</version>
+  <groupId>com.braimanm</groupId>
+  <artifactId>uitaf</artifactId>
+  <version>3.0.0</version>
 </dependency>
 ```
 [Read the docs](https://uitaf.org) for any further information.
