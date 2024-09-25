@@ -27,7 +27,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "unused"})
 @Resource.Classpath("test.properties")
 public class TestProperties {
 	private String reportVersion = "1.0.1";

@@ -17,10 +17,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+@SuppressWarnings("unused")
 public class UserProvider {
     private static UserProvider instance = null;
-    private ConcurrentMap<Thread, List<EnvironmentsSetup.User>> users = new ConcurrentHashMap<>();
-    private Iterator<List<EnvironmentsSetup.User>> iterator;
+    private final ConcurrentMap<Thread, List<EnvironmentsSetup.User>> users = new ConcurrentHashMap<>();
+    private final Iterator<List<EnvironmentsSetup.User>> iterator;
 
     private UserProvider() {
         EnvironmentsSetup.Environment env = TestContext.getTestProperties().getTestEnvironment();
@@ -44,13 +45,9 @@ public class UserProvider {
         iterator = usersGroups.values().iterator();
     }
 
-    public static UserProvider getInstance() {
+    public static synchronized UserProvider getInstance() {
         if (instance == null) {
-            synchronized ( (UserProvider.class)) {
-                if (instance == null) {
-                    instance = new UserProvider();
-                }
-            }
+            instance = new UserProvider();
         }
         return instance;
     }

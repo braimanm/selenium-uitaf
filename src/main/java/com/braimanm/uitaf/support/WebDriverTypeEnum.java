@@ -13,6 +13,7 @@ Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 
 package com.braimanm.uitaf.support;
 
+@SuppressWarnings("unused")
 public enum WebDriverTypeEnum {
     CHROME("CHROME"),
     EDGE("EDGE"),
@@ -25,7 +26,7 @@ public enum WebDriverTypeEnum {
     IPAD("IPAD"),
     OVERWRITE("overwrite");
 
-    String driverName;
+    final String driverName;
 
     WebDriverTypeEnum(String driverName) {
         this.driverName = driverName;
