@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.googlecode.page-component</groupId>
-    <artifactId>ui_auto_core</artifactId>
-    <version>2.7.1</version>
+    <groupId>com.braimanm</groupId>
+    <artifactId>uitaf</artifactId>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <description>Selenium based UI Test Automation Framework (selenium-uitaf) is Java framework which simplifies
@@ -29,92 +29,110 @@
     </developers>
 
     <scm>
-        <url>
-            https://github.com/braimanm/selenium-uitaf
-        </url>
+        <url>https://github.com/braimanm/selenium-uitaf</url>
     </scm>
 
-
     <properties>
-        <compiler.version>1.8</compiler.version>
-        <page-component.version>1.7.1</page-component.version>
-        <allure.version>1.5.4</allure.version>
-        <jetty.version>9.4.44.v20210927</jetty.version>
-        <testNg.version>6.14.3</testNg.version>
-        <apache.commons.version>3.12.0</apache.commons.version>
+        <java.version>11</java.version>
+        <page-component.version>3.0.0</page-component.version>
+        <allure.version>2.30.0</allure.version>
+        <allure.testng.vesrsion>2.29.0</allure.testng.vesrsion>
+        <selenium.version>4.25.0</selenium.version>
+        <properties.version>2.0.RC6</properties.version>
+        <guava.version>33.0.0-jre</guava.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-compress.version>1.26.0</commons-compress.version>
+        <webdrivermanager.version>5.3.2</webdrivermanager.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <webdrivermanager_version>5.5.3</webdrivermanager_version>
     </properties>
-
 
     <dependencies>
         <dependency>
-            <groupId>ru.yandex.qatools.allure</groupId>
-            <artifactId>allure-java-aspects</artifactId>
-            <version>${allure.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ru.yandex.qatools.allure</groupId>
-            <artifactId>allure-testng-adaptor</artifactId>
-            <version>${allure.version}</version>
-            <classifier>spi-off</classifier>
-        </dependency>
-        <dependency>
-            <groupId>ru.yandex.qatools.allure</groupId>
-            <artifactId>allure-bundle</artifactId>
-            <version>${allure.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>31.0.1-jre</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.page-component</groupId>
+            <groupId>com.braimanm</groupId>
             <artifactId>page-component</artifactId>
             <version>${page-component.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.3</version>
         </dependency>
+
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testNg.version}</version>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-testng</artifactId>
+            <version>${allure.testng.vesrsion}</version>
+            <classifier>spi-off</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.testng</groupId>
+                    <artifactId>testng</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-generator</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-commandline</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>ru.qatools.commons</groupId>
+            <artifactId>properties</artifactId>
+            <version>${properties.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${apache.commons.version}</version>
+            <version>${commons-lang3.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>${webdrivermanager_version}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aeonbits.owner</groupId>
+            <artifactId>owner</artifactId>
+            <version>1.0.12</version>
         </dependency>
 
     </dependencies>
-
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.10.1</version>
                 <configuration>
-                    <source>${compiler.version}</source>
-                    <target>${compiler.version}</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>
@@ -126,7 +144,7 @@
                     <serverId>nexus-releases</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>false</autoReleaseAfterClose>
-<!--                    <skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
+                    <!--                    <skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
                 </configuration>
             </plugin>
         </plugins>
