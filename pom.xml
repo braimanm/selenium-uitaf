@@ -13,7 +13,9 @@
         development process for Web UI test automation scripts.
     </description>
     <url>https://github.com/braimanm/selenium-uitaf</url>
-
+    <scm>
+        <url>https://github.com/braimanm/selenium-uitaf</url>
+    </scm>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -27,10 +29,6 @@
             <email>braimanm@gmail.com</email>
         </developer>
     </developers>
-
-    <scm>
-        <url>https://github.com/braimanm/selenium-uitaf</url>
-    </scm>
 
     <properties>
         <java.version>11</java.version>
@@ -138,13 +136,13 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
+                <version>1.7.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>nexus-releases</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <serverId>nexus-releases01</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                    <!--                    <skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
+                    <!--<skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
                 </configuration>
             </plugin>
         </plugins>
