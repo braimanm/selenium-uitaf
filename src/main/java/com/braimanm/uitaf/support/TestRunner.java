@@ -106,7 +106,7 @@ public class TestRunner {
 
 	public void generateReport() throws IOException, InterruptedException {
 		unpackAllureConfig();
-		String[] arguments = {"generate",resultsFolder,"-o",reportFolder};
+		String[] arguments = {"generate",resultsFolder,"-o",reportFolder,"--name","UITAF Report"};
 		CommandLine.main(arguments);
 		//brandingMod();
 	}

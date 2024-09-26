@@ -14,7 +14,12 @@ Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 package com.braimanm.uitaf.testng;
 
 import com.braimanm.uitaf.support.TestContext;
-import io.qameta.allure.*;
+import io.qameta.allure.Allure;
+import io.qameta.allure.AllureLifecycle;
+import io.qameta.allure.Flaky;
+import io.qameta.allure.Muted;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.model.Link;
 import io.qameta.allure.model.*;
 import io.qameta.allure.testng.TestInstanceParameter;

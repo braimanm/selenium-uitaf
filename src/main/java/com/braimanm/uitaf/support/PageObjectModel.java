@@ -22,6 +22,7 @@ import com.braimanm.uitaf.testng.TestNGBase;
 
 import io.qameta.allure.Allure;
 import io.qameta.allure.model.Label;
+import io.qameta.allure.model.Parameter;
 import io.qameta.allure.util.ResultsUtils;
 import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDateTime;
@@ -79,9 +80,18 @@ public class PageObjectModel extends PageObject {
         labels.addAll(getLabels(data, "test-IDs", ResultsUtils.ALLURE_ID_LABEL_NAME));
         labels.addAll(getLabels(data, "test-severity", ResultsUtils.SEVERITY_LABEL_NAME));
 
-
-        Allure.getLifecycle().updateTestCase(testResult -> testResult.setTestCaseName(name));
-        Allure.getLifecycle().updateTestCase(testResult -> testResult.setDescription(description));
+        if (name != null && !name.trim().isBlank()) {
+            Allure.getLifecycle().updateTestCase(testResult -> {
+                if (name.contains("+")) {
+                    testResult.setName(name.replace("+",testResult.getName()));
+                } else {
+                    testResult.setName(name);
+                }
+            });
+        }
+        if (description != null && !description.trim().isBlank()) {
+            Allure.description(description);
+        }
         Allure.getLifecycle().updateTestCase(testResult -> testResult.getLabels().addAll(labels));
     }
 
@@ -115,6 +125,22 @@ public class PageObjectModel extends PageObject {
         });
     }
 
-    protected void reportForAutoFill(String fieldName, String value) {}
+    /**
+     * This method is used to report on each field population.
+     * Simply add the @Step annotation to the overridden method.
+     * @param fieldName - name of the field to be reported
+     * @param value - value to be reported
+     */
+    protected void reportForAutoFill(String fieldName, String value) {
+        hideStepParams();
+    }
+
+    /**
+     * Used for hiding automatic parameters in Allure report step methods.
+     */
+    public void hideStepParams() {
+        Allure.getLifecycle().updateStep(stepResult -> stepResult.getParameters().
+                forEach(parameter -> parameter.setMode(Parameter.Mode.HIDDEN)));
+    }
 
 }

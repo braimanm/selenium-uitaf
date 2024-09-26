@@ -6,7 +6,7 @@
 
     <groupId>com.braimanm</groupId>
     <artifactId>uitaf</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <description>Selenium based UI Test Automation Framework (selenium-uitaf) is Java framework which simplifies
