@@ -61,7 +61,7 @@ This open source project is distributed through maven central repository. Here i
 <dependency>
   <groupId>com.braimanm</groupId>
   <artifactId>uitaf</artifactId>
-  <version>3.0.0</version>
+  <version>3.1.0</version>
 </dependency>
 ```
 [Read the docs](https://uitaf.org) for any further information.

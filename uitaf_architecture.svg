@@ -30,7 +30,7 @@
      showguides="true"
      inkscape:zoom="1.0008322"
      inkscape:cx="461.61584"
-     inkscape:cy="272.27341"
+     inkscape:cy="342.21521"
      inkscape:window-width="2056"
      inkscape:window-height="1172"
      inkscape:window-x="0"
@@ -831,7 +831,7 @@
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.52778px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;text-anchor:middle;fill:#1a1a1a;stroke:none;stroke-width:1"
          x="95.263992"
          y="224.40126"
-         id="tspan4-46-2-9-3">Selenium WebDriver API</tspan></text>
+         id="tspan4-46-2-9-3">Selenium WebDriver API/Appium API</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.52777px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold Italic';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.396999;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:330.933;stroke-opacity:1"
@@ -879,7 +879,7 @@
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.52778px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;text-anchor:middle;fill:#1a1a1a;stroke:none;stroke-width:1"
          x="94.994728"
          y="263.29477"
-         id="tspan4-46-2-9-8-1-0">Web Browser</tspan></text>
+         id="tspan4-46-2-9-8-1-0">Web Browser/Mobile Device</tspan></text>
     <rect
        style="fill:url(#linearGradient43);stroke:#000000;stroke-width:1.1048;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:330.933"
        id="rect1-0-4-9-5"
