@@ -38,29 +38,42 @@ public class TestNGBase {
 	private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 	private long time;
 
-	public WebDriverContext getContext() {
-		if (TestContext.getContext() == null) {
-			TestContext.init();
-			String driverInfo = TestContext.getContext().getDriver().toString();
+	public WebDriverContext getContext(String contextName) {
+		if (TestContext.getContext(contextName) == null) {
+			TestContext.init(contextName);
+			String driverInfo = "[" + contextName + "]: " +TestContext.getContext(contextName).getDriver().toString();
 			setAttribute("driver-info", driverInfo);
 			logInfo("+INITIALIZING CONTEXT: " + driverInfo );
 		}
-		return TestContext.getContext();
+		return TestContext.getContext(contextName);
+	}
+
+	public WebDriverContext getContext() {
+		return getContext(TestContext.DEFAULT);
 	}
 
 	protected void closeDriver() {
 		TestContext.removeContext();
 	}
 
-	public synchronized static void takeScreenshot(String title) {
-        if (TestContext.getContext() != null) {
+	protected void closeDriver(String contextName) {
+		TestContext.removeContext(contextName);
+	}
+
+	public synchronized static void takeScreenshot(String contextName, String title) {
+        if (TestContext.getContext(contextName) != null) {
         	try {
-				TakesScreenshot takesScreenshot = (TakesScreenshot) TestContext.getContext().getDriver();
+				TakesScreenshot takesScreenshot = (TakesScreenshot) TestContext.getContext(contextName).getDriver();
 				byte[] attachment = takesScreenshot.getScreenshotAs(OutputType.BYTES);
 				Allure.getLifecycle().addAttachment(title, "image/png", "png", attachment);
 			} catch (Exception ignore) {}
 		}
 	}
+
+	public static void takeScreenshot(String title) {
+		takeScreenshot(TestContext.DEFAULT, title);
+	}
+
 
 	public synchronized static String getTestInfo() {
 		String testInfo = testNgContext.get().getCurrentXmlTest().getName();
@@ -83,8 +96,10 @@ public class TestNGBase {
 	private void closeDriverAfterTest() {
 		time = (System.currentTimeMillis() - time) / 1000;
 		String driverInfo = getAttribute("driver-info");
-		logInfo("-CLOSING CONTEXT: " + driverInfo);
-		closeDriver();
+		for (String contextName : TestContext.getAllContextNames()) {
+			logInfo("-CLOSING CONTEXT[" + contextName + "]:" + driverInfo);
+			closeDriver(contextName);
+		}
 	}
 
 	@BeforeTest

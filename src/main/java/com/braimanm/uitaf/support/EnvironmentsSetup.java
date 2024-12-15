@@ -25,6 +25,34 @@ import java.util.List;
 public class EnvironmentsSetup extends DataPersistence {
     @XStreamImplicit
     private List<Environment> config;
+    private List<Property> global;
+
+    public String getCustom(String name) {
+        for (Property p : global) {
+            if (p.name.equals(name)) {
+                return p.value;
+            }
+        }
+        throw new RuntimeException("Property \"" + name  + "\" was not found in environments configuration file");
+
+    }
+
+    public List<Property> getCustom() {
+        return this.global;
+    }
+
+    public Environment getEnvironment(String env) {
+        for (Environment environment : config) {
+            if (environment.getEnvironmentName().equalsIgnoreCase(env)) {
+                return environment;
+            }
+        }
+        throw new RuntimeException("Environment \"" + env + "\" was not found in environments configuration file");
+    }
+
+    public List<Environment> getAllEnvironments() {
+        return config;
+    }
 
     @XStreamAlias("environment")
     public static class Environment {
@@ -70,6 +98,10 @@ public class EnvironmentsSetup extends DataPersistence {
             throw new RuntimeException("Property \"" + name  + "\" was not found in environments configuration file");
 
         }
+
+        public List<Property> getCustom() {
+            return this.custom;
+        }
     }
 
     @XStreamAlias("user")
@@ -110,15 +142,10 @@ public class EnvironmentsSetup extends DataPersistence {
             throw new RuntimeException("Property \"" + name  + "\" was not found for user " + role + " in configuration file");
 
         }
-    }
 
-    public Environment getEnvironment(String env) {
-        for (Environment environment : config) {
-            if (environment.getEnvironmentName().equalsIgnoreCase(env)) {
-                return environment;
-            }
+        public List<Property> getCustom() {
+            return this.custom;
         }
-        throw new RuntimeException("Environment \"" + env + "\" was not found in environments configuration file");
     }
 
     @XStreamAlias("prop")
