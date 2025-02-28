@@ -19,16 +19,19 @@ import com.braimanm.datainstiller.data.DataPersistence;
 import com.braimanm.ui.auto.pagecomponent.PageObject;
 import com.braimanm.ui.auto.pagecomponent.SkipAutoFill;
 import com.braimanm.uitaf.testng.TestNGBase;
-
 import io.qameta.allure.Allure;
 import io.qameta.allure.model.Label;
+import io.qameta.allure.model.Link;
 import io.qameta.allure.model.Parameter;
 import io.qameta.allure.util.ResultsUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"NewClassNamingConvention", "unused"})
 public class PageObjectModel extends PageObject {
@@ -54,32 +57,29 @@ public class PageObjectModel extends PageObject {
         }
     }
 
-    private List<Label> getLabels(DataPersistence data, String labelAlias, String labelName) {
-        DataAliases aliases = data.getDataAliases();
-        String label = aliases.getAsString(labelAlias);
-        List<Label> labels = new ArrayList<>();
-        if (label != null) {
-            for (String value : label.split(",")) {
-                labels.add(new Label().setName(labelName).setValue(value.trim()));
-            }
-        }
-        return labels;
+    private List<Label> getLabels(String labelNames, String labelType) {
+        if (labelNames == null || labelNames.trim().isEmpty()) return new ArrayList<>();
+        return Arrays.stream(labelNames.split(","))
+                .map(String::trim)
+                .filter(name -> !name.isEmpty())
+                .map(name -> ResultsUtils.createLabel(labelType, name))
+                .collect(Collectors.toList());
+    }
+
+    private List<Link> getLinks(String linkNames, String type) {
+        if (linkNames == null || linkNames.trim().isEmpty()) return new ArrayList<>();
+        return Arrays.stream(linkNames.split(","))
+                .map(String::trim)
+                .filter(name -> !name.isEmpty())
+                .map(name -> ResultsUtils.createLink(name, null, null, type)) // Create Link objects
+                .collect(Collectors.toList());
     }
 
     private void overwriteTestParameters(DataPersistence data) {
         DataAliases aliases = data.getDataAliases();
         if (aliases == null) return;
+
         String name = aliases.getAsString("test-name");
-        String description = aliases.getAsString("test-description");
-
-        List<Label> labels = new ArrayList<>();
-        labels.addAll(getLabels(data, "test-epic", ResultsUtils.EPIC_LABEL_NAME));
-        labels.addAll(getLabels(data, "test-features", ResultsUtils.FEATURE_LABEL_NAME));
-        labels.addAll(getLabels(data, "test-stories", ResultsUtils.STORY_LABEL_NAME));
-        labels.addAll(getLabels(data, "test-issues", ResultsUtils.ISSUE_LINK_TYPE));
-        labels.addAll(getLabels(data, "test-IDs", ResultsUtils.ALLURE_ID_LABEL_NAME));
-        labels.addAll(getLabels(data, "test-severity", ResultsUtils.SEVERITY_LABEL_NAME));
-
         if (name != null && !name.trim().isBlank()) {
             Allure.getLifecycle().updateTestCase(testResult -> {
                 if (name.contains("+")) {
@@ -89,10 +89,27 @@ public class PageObjectModel extends PageObject {
                 }
             });
         }
+
+        String description = aliases.getAsString("test-description");
         if (description != null && !description.trim().isBlank()) {
             Allure.description(description);
         }
-        Allure.getLifecycle().updateTestCase(testResult -> testResult.getLabels().addAll(labels));
+
+        List<Label> labels = new ArrayList<>();
+        labels.addAll(getLabels(aliases.getAsString("test-epic"), ResultsUtils.EPIC_LABEL_NAME));
+        labels.addAll(getLabels(aliases.getAsString("test-features"), ResultsUtils.FEATURE_LABEL_NAME));
+        labels.addAll(getLabels(aliases.getAsString("test-stories"), ResultsUtils.STORY_LABEL_NAME));
+        labels.addAll(getLabels(aliases.getAsString("test-severity"), ResultsUtils.SEVERITY_LABEL_NAME));
+
+        Allure.getLifecycle().updateTestCase(testResult -> testResult.setLabels(labels));
+
+        List<Link> links = new ArrayList<>();
+        links.addAll(getLinks(aliases.getAsString("test-issues"), ResultsUtils.ISSUE_LINK_TYPE));
+        links.addAll(getLinks(aliases.getAsString("test-tmsLinks"), ResultsUtils.TMS_LINK_TYPE));
+        links.addAll(getLinks(aliases.getAsString("test-links"), ResultsUtils.CUSTOM_LINK_TYPE));
+
+        Allure.getLifecycle().updateTestCase(testResult -> testResult.getLinks().addAll(links));
+
     }
 
     @Override
