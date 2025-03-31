@@ -14,19 +14,13 @@ Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 package com.braimanm.uitaf.support;
 
 import com.braimanm.uitaf.testng.TestParameterValidator;
-import com.braimanm.uitaf.utils.CommandLine;
 import io.qameta.allure.model.Parameter;
 import io.qameta.allure.util.PropertiesUtils;
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.testng.TestNG;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Properties;
 
@@ -67,54 +61,6 @@ public class TestRunner {
 		return testNg.getStatus();
 	}
 
-	public void unpackAllureConfig() throws IOException {
-		String homeFolder = FileUtils.getTempDirectoryPath() + "allurehome";
-		File targetDir = new File(homeFolder);
-		FileUtils.deleteDirectory(targetDir);
-		//FileUtils.forceMkdir(targetDir);
-		System.setProperty("APP_HOME", homeFolder);
-
-		try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("allurehome/allureconfig.zip");
-			 InputStream bis = new BufferedInputStream(is);
-			 ArchiveInputStream<ZipArchiveEntry> archIs = new ZipArchiveInputStream(bis,null, true, true)) {
-
-			ArchiveEntry entry;
-
-			while ((entry = archIs.getNextEntry()) != null) {
-				if (!archIs.canReadEntryData(entry)) {
-					// log something?
-					continue;
-				}
-				String name = targetDir.getAbsolutePath() + "/" + entry;
-				File f = new File(name);
-				if (entry.isDirectory()) {
-					if (!f.isDirectory() && !f.mkdirs()) {
-						throw new IOException("failed to create directory " + f);
-					}
-				} else {
-					File parent = f.getParentFile();
-					if (!parent.isDirectory() && !parent.mkdirs()) {
-						throw new IOException("failed to create directory " + parent);
-					}
-					try (OutputStream o = Files.newOutputStream(f.toPath())) {
-						IOUtils.copy(archIs, o);
-					}
-				}
-			}
-		}
-	}
-
-	public void generateReport() throws IOException, InterruptedException {
-		unpackAllureConfig();
-		String[] arguments = {"generate",resultsFolder,"-o",reportFolder,"--name","UITAF Report"};
-		CommandLine.main(arguments);
-		//brandingMod();
-	}
-
-	public void openReport() throws InterruptedException {
-		String[] arguments = {"open",reportFolder,"-h","localhost","-p", "" + TestContext.getTestProperties().getReportPort()};
-		CommandLine.main(arguments);
-	}
 
 	private void saveEnvironment() throws IOException {
 		TestProperties props = TestContext.getTestProperties();
@@ -136,6 +82,32 @@ public class TestRunner {
 		File resFolder = new File(reportFolder);
 		if (resFolder.exists()) {
 			FileUtils.forceDelete(resFolder);
+		}
+	}
+
+	public void openAllureReport() {
+		try {
+			// Check if Allure CLI is installed
+			Process checkAllure = new ProcessBuilder("allure", "--version")
+					.redirectErrorStream(true)
+					.start();
+
+			if (checkAllure.waitFor() != 0) {
+				System.err.println("Allure CLI not found. Please install it from:");
+				System.err.println("https://allurereport.org/docs/install/");
+				return;
+			}
+
+			// Serve the Allure report (this also opens it in the browser)
+			Process serveReport = new ProcessBuilder("allure", "serve", resultsFolder)
+					.inheritIO()
+					.start();
+
+			serveReport.waitFor();
+
+		} catch (IOException | InterruptedException e) {
+			System.err.println("Failed to run Allure. Make sure Allure CLI is in your PATH.");
+			e.printStackTrace();
 		}
 	}
 

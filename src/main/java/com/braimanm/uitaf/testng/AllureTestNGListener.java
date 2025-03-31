@@ -270,7 +270,7 @@ public class AllureTestNGListener implements
 
 	@Override
 	public void beforeInvocation(final IInvokedMethod method, final ITestResult testResult) {
-		if (method.isConfigurationMethod()) {
+		if (method.isConfigurationMethod() && !method.getTestMethod().getMethodName().matches("_.*_")) {
 			String uuid = getUniqueUuid(testResult);
 			String parentUuid = getUniqueUuid(testResult.getTestContext());
 			if (isBeforeFixture(method.getTestMethod())) {
@@ -323,23 +323,27 @@ public class AllureTestNGListener implements
 	@Override
 	public void onConfigurationSuccess(final ITestResult itr) {
 		String uuid = getUniqueUuid(itr);
-		lifecycle.updateFixture(uuid, fixtureResult -> {
-			fixtureResult.setStage(Stage.FINISHED);
-			fixtureResult.setStatus(Status.PASSED);
-		});
-		lifecycle.stopFixture(getUniqueUuid(itr));
+		if (!itr.getMethod().getMethodName().matches("_.*_")) {
+			lifecycle.updateFixture(uuid, fixtureResult -> {
+				fixtureResult.setStage(Stage.FINISHED);
+				fixtureResult.setStatus(Status.PASSED);
+			});
+			lifecycle.stopFixture(getUniqueUuid(itr));
+		}
 	}
 
 	@Override
 	public void onConfigurationFailure(final ITestResult itr) {
 		String uuid = getUniqueUuid(itr);
-		final StatusDetails details = getStatusDetails(itr.getThrowable()).orElse(null);
-		lifecycle.updateFixture(uuid, fixtureResult -> {
-			fixtureResult.setStage(Stage.FINISHED);
-			fixtureResult.setStatus(Status.BROKEN);
-			fixtureResult.setStatusDetails(details);
-		});
-		lifecycle.stopFixture(getUniqueUuid(itr));
+		if (!itr.getMethod().getMethodName().matches("_.*_")) {
+			final StatusDetails details = getStatusDetails(itr.getThrowable()).orElse(null);
+			lifecycle.updateFixture(uuid, fixtureResult -> {
+				fixtureResult.setStage(Stage.FINISHED);
+				fixtureResult.setStatus(Status.BROKEN);
+				fixtureResult.setStatusDetails(details);
+			});
+			lifecycle.stopFixture(getUniqueUuid(itr));
+		}
 	}
 
 	@Override
@@ -355,11 +359,13 @@ public class AllureTestNGListener implements
 			}
 		}
 		String uuid = getUniqueUuid(itr);
-		lifecycle.updateFixture(uuid, fixtureResult -> {
-			fixtureResult.setStage(Stage.FINISHED);
-			fixtureResult.setStatus(Status.SKIPPED);
-		});
-		lifecycle.stopFixture(getUniqueUuid(itr));
+		if (!itr.getMethod().getMethodName().matches("_.*_")) {
+			lifecycle.updateFixture(uuid, fixtureResult -> {
+				fixtureResult.setStage(Stage.FINISHED);
+				fixtureResult.setStatus(Status.SKIPPED);
+			});
+			lifecycle.stopFixture(getUniqueUuid(itr));
+		}
 	}
 
 	protected String getHistoryId(final ITestNGMethod method, final List<Parameter> parameters) {

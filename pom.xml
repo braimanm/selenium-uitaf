@@ -6,7 +6,7 @@
 
     <groupId>com.braimanm</groupId>
     <artifactId>uitaf</artifactId>
-    <version>3.2.3</version>
+    <version>3.2.4</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <description>Selenium based UI Test Automation Framework (selenium-uitaf) is Java framework which simplifies
@@ -33,7 +33,6 @@
     <properties>
         <java.version>11</java.version>
         <page-component.version>3.2.0</page-component.version>
-        <allure.version>2.33.0</allure.version>
         <allure.testng.vesrsion>2.29.1</allure.testng.vesrsion>
         <selenium.version>4.30.0</selenium.version>
         <properties.version>2.0.RC6</properties.version>
@@ -68,19 +67,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-generator</artifactId>
-            <version>${allure.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-commandline</artifactId>
-            <version>${allure.version}</version>
-        </dependency>
-
 
         <dependency>
             <groupId>ru.qatools.commons</groupId>

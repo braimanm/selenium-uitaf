@@ -44,11 +44,11 @@ public class RunTests {
         status = runner.runTests(props.getSuites());
         logger.info(String.format(msgTemplate, "...SUITE EXECUTION IS FINISHED\n"));
 
-        if (props.isShowReport() && isNotRunningOnJenkins()) {
-            logger.info(String.format(msgTemplate, "...GENERATING ALLURE REPORT...\n"));
-            runner.generateReport();
-            logger.info(String.format(msgTemplate, "...ALLURE REPORT IS GENERATED..."));
-        }
+//        if (props.isShowReport() && isNotRunningOnJenkins()) {
+//            logger.info(String.format(msgTemplate, "...GENERATING ALLURE REPORT...\n"));
+//            runner.generateReport();
+//            logger.info(String.format(msgTemplate, "...ALLURE REPORT IS GENERATED..."));
+//        }
 
         Date endTime = new Date();
         logger.info(String.format(msgTemplate, "Completed At:  " + endTime));
@@ -57,7 +57,7 @@ public class RunTests {
 
         if (props.isShowReport() && isNotRunningOnJenkins()) {
             logger.info(String.format(msgTemplate, "...OPENING ALLURE REPORT..."));
-            runner.openReport();
+            runner.openAllureReport();
         }
 
         System.exit(status);

@@ -103,7 +103,7 @@ public class TestNGBase {
 	}
 
 	@BeforeTest(alwaysRun = true)
-	public void beforeTest(ITestContext testNgContext) {
+	public void _beforeTest_(ITestContext testNgContext) {
 		String parallel = testNgContext.getSuite().getParallel();
 		if (parallel.equals("tests") || parallel.equals("none")) {
 			initTest(testNgContext);
@@ -111,7 +111,7 @@ public class TestNGBase {
 	}
 
 	@AfterTest(alwaysRun = true)
-	public void afterTest(ITestContext testNgContext) {
+	public void _afterTest_(ITestContext testNgContext) {
 		String parallel = testNgContext.getSuite().getParallel();
 		if (parallel.equals("tests") || parallel.equals("none")) {
 			closeDriverAfterTest();
@@ -119,21 +119,21 @@ public class TestNGBase {
 	}
 
 	@BeforeMethod(alwaysRun = true)
-	public void beforeMethod(ITestContext testNgContext) {
+	public void _beforeMethod_(ITestContext testNgContext) {
 		if (testNgContext.getSuite().getParallel().equals("methods")) {
 			initTest(testNgContext);
 		}
 	}
 
 	@AfterMethod(alwaysRun = true)
-	public void afterMethod(ITestContext testNgContext) {
+	public void _afterMethod_(ITestContext testNgContext) {
 		if (testNgContext.getSuite().getParallel().equals("methods")) {
 			closeDriverAfterTest();
 		}
 	}
 
 	@BeforeClass(alwaysRun = true)
-	public void beforeClass(ITestContext testNgContext) {
+	public void _beforeClass_(ITestContext testNgContext) {
 		String parallel = testNgContext.getSuite().getParallel();
 		if (parallel.equals("classes") || parallel.equals("instances")) {
 			initTest(testNgContext);
@@ -141,7 +141,7 @@ public class TestNGBase {
 	}
 
 	@AfterClass(alwaysRun = true)
-	public void afterClass(ITestContext testNgContext) {
+	public void _afterClass_(ITestContext testNgContext) {
 		String parallel = testNgContext.getSuite().getParallel();
 		if (parallel.equals("classes") || parallel.equals("instances")) {
 			closeDriverAfterTest();
