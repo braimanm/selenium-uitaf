@@ -41,7 +41,7 @@ public class TestNGBase {
 	public WebDriverContext getContext(String contextName) {
 		if (TestContext.getContext(contextName) == null) {
 			TestContext.init(contextName);
-			String driverInfo = "[" + contextName + "]: " +TestContext.getContext(contextName).getDriver().toString();
+			String driverInfo = "[" + contextName + "]: " + TestContext.getContext(contextName).getDriver().toString();
 			setAttribute("driver-info", driverInfo);
 			logInfo("+INITIALIZING CONTEXT: " + driverInfo );
 		}
@@ -102,38 +102,50 @@ public class TestNGBase {
 		}
 	}
 
-	@BeforeTest
+	@BeforeTest(alwaysRun = true)
 	public void beforeTest(ITestContext testNgContext) {
 		String parallel = testNgContext.getSuite().getParallel();
-		if (parallel.equals("tests") || parallel.equals("none")) initTest(testNgContext);
+		if (parallel.equals("tests") || parallel.equals("none")) {
+			initTest(testNgContext);
+		}
 	}
 
-	@AfterTest
+	@AfterTest(alwaysRun = true)
 	public void afterTest(ITestContext testNgContext) {
 		String parallel = testNgContext.getSuite().getParallel();
-		if (parallel.equals("tests") || parallel.equals("none")) closeDriverAfterTest();
+		if (parallel.equals("tests") || parallel.equals("none")) {
+			closeDriverAfterTest();
+		}
 	}
 
-	@BeforeMethod
+	@BeforeMethod(alwaysRun = true)
 	public void beforeMethod(ITestContext testNgContext) {
-		if (testNgContext.getSuite().getParallel().equals("methods")) initTest(testNgContext);
+		if (testNgContext.getSuite().getParallel().equals("methods")) {
+			initTest(testNgContext);
+		}
 	}
 
-	@AfterMethod
+	@AfterMethod(alwaysRun = true)
 	public void afterMethod(ITestContext testNgContext) {
-		if (testNgContext.getSuite().getParallel().equals("methods")) closeDriverAfterTest();
+		if (testNgContext.getSuite().getParallel().equals("methods")) {
+			closeDriverAfterTest();
+		}
 	}
 
-	@BeforeClass
+	@BeforeClass(alwaysRun = true)
 	public void beforeClass(ITestContext testNgContext) {
 		String parallel = testNgContext.getSuite().getParallel();
-		if (parallel.equals("classes") || parallel.equals("instances")) initTest(testNgContext);
+		if (parallel.equals("classes") || parallel.equals("instances")) {
+			initTest(testNgContext);
+		}
 	}
 
-	@AfterClass
+	@AfterClass(alwaysRun = true)
 	public void afterClass(ITestContext testNgContext) {
 		String parallel = testNgContext.getSuite().getParallel();
-		if (parallel.equals("classes") || parallel.equals("instances")) closeDriverAfterTest();
+		if (parallel.equals("classes") || parallel.equals("instances")) {
+			closeDriverAfterTest();
+		}
 	}
 
 	protected void setAttribute(String alias, Object value){

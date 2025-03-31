@@ -25,8 +25,8 @@ import java.util.Date;
 public class RunTests {
     private final static Logger logger = LoggerFactory.getLogger(RunTests.class);
 
-    private static boolean isRunningOnJenkins() {
-        return System.getenv().containsKey("JENKINS_HOME");
+    private static boolean isNotRunningOnJenkins() {
+        return !System.getenv().containsKey("JENKINS_HOME");
     }
 
     public static void main(String[] args) throws Exception {
@@ -42,15 +42,20 @@ public class RunTests {
         logger.info(String.format(msgTemplate, "...CLEANING RESULT FOLDER..."));
         runner.deleteResultsFolder();
         status = runner.runTests(props.getSuites());
-        logger.info(String.format(msgTemplate, "...SUITE EXECUTION IS FINISHED, GENERATING ALLURE REPORT...\n"));
-        runner.generateReport();
-        logger.info(String.format(msgTemplate, "...ALLURE REPORT IS GENERATED..."));
+        logger.info(String.format(msgTemplate, "...SUITE EXECUTION IS FINISHED\n"));
+
+        if (props.isShowReport() && isNotRunningOnJenkins()) {
+            logger.info(String.format(msgTemplate, "...GENERATING ALLURE REPORT...\n"));
+            runner.generateReport();
+            logger.info(String.format(msgTemplate, "...ALLURE REPORT IS GENERATED..."));
+        }
+
         Date endTime = new Date();
         logger.info(String.format(msgTemplate, "Completed At:  " + endTime));
         String duration = DurationFormatUtils.formatPeriod(startTime.getTime(), endTime.getTime(), "HH:mm:ss");
         logger.info(String.format(msgTemplate, "Duration:  " + duration));
 
-        if (props.isShowReport() && !isRunningOnJenkins()) {
+        if (props.isShowReport() && isNotRunningOnJenkins()) {
             logger.info(String.format(msgTemplate, "...OPENING ALLURE REPORT..."));
             runner.openReport();
         }
