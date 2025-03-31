@@ -106,12 +106,13 @@ public class DefaultDriverProvider implements DriverProvider {
             case CHROME:
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.merge(desiredCapabilities);
+                chromeOptions.addArguments("--disable-notifications");
                 if (prop.getHeadless()) {
-                    chromeOptions.addArguments("--headless=new");
+                    chromeOptions.addArguments("--headless=new", "--disable-gpu");
                     String res = prop.getScreenSize();
                     if (res != null) {
                         res = res.toLowerCase().trim().replace("x", ",");
-                        chromeOptions.addArguments("window-size=" + res);
+                        chromeOptions.addArguments("--window-size=" + res);
                     }
                 }
                 if (prop.getRemoteURL() != null) {
