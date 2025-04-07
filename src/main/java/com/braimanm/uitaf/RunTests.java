@@ -42,14 +42,8 @@ public class RunTests {
         logger.info(String.format(msgTemplate, "...CLEANING RESULT FOLDER..."));
         runner.deleteResultsFolder();
         status = runner.runTests(props.getSuites());
+        if (status == 2) status = 0; //TestNG is returning exit code 2 when there are skipped tests due to retry and  at the same time there are no failures
         logger.info(String.format(msgTemplate, "...SUITE EXECUTION IS FINISHED\n"));
-
-//        if (props.isShowReport() && isNotRunningOnJenkins()) {
-//            logger.info(String.format(msgTemplate, "...GENERATING ALLURE REPORT...\n"));
-//            runner.generateReport();
-//            logger.info(String.format(msgTemplate, "...ALLURE REPORT IS GENERATED..."));
-//        }
-
         Date endTime = new Date();
         logger.info(String.format(msgTemplate, "Completed At:  " + endTime));
         String duration = DurationFormatUtils.formatPeriod(startTime.getTime(), endTime.getTime(), "HH:mm:ss");
