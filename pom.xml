@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.braimanm</groupId>
     <artifactId>uitaf</artifactId>
-    <version>3.2.5</version>
+    <version>3.2.6</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-    <description>Selenium based UI Test Automation Framework (selenium-uitaf) is Java framework which simplifies
-        development process for Web UI test automation scripts.
-    </description>
+    <description>Selenium-based UI Test Automation Framework (UITAF) that simplifies development of test scripts.</description>
     <url>https://github.com/braimanm/selenium-uitaf</url>
-    <scm>
-        <url>https://github.com/braimanm/selenium-uitaf</url>
-    </scm>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -23,6 +19,13 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <scm>
+        <url>https://github.com/braimanm/selenium-uitaf</url>
+        <connection>scm:git:git://github.com/braimanm/selenium-uitaf.git</connection>
+        <developerConnection>scm:git:ssh://github.com/braimanm/selenium-uitaf.git</developerConnection>
+    </scm>
+
     <developers>
         <developer>
             <name>Michael Braiman</name>
@@ -32,8 +35,8 @@
 
     <properties>
         <java.version>11</java.version>
-        <page-component.version>3.2.0</page-component.version>
-        <allure.testng.vesrsion>2.29.1</allure.testng.vesrsion>
+        <page-component.version>3.2.1</page-component.version>
+        <allure.testng.version>2.29.1</allure.testng.version>
         <selenium.version>4.31.0</selenium.version>
         <properties.version>2.0.RC6</properties.version>
         <guava.version>33.0.0-jre</guava.version>
@@ -58,7 +61,7 @@
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-testng</artifactId>
-            <version>${allure.testng.vesrsion}</version>
+            <version>${allure.testng.version}</version>
             <classifier>spi-off</classifier>
             <exclusions>
                 <exclusion>
@@ -97,11 +100,11 @@
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
         </dependency>
-
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Java compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -112,6 +115,43 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
+
+            <!-- Source JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Javadoc JAR with warning suppression -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <quiet>true</quiet>
+                    <additionalJOption>-Xdoclint:none</additionalJOption>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- OSSRH Nexus staging plugin -->
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -121,11 +161,36 @@
                     <serverId>nexus-releases01</serverId>
                     <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                    <!--<skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <!--
+    Build & Deployment Notes:
+
+    To build the library locally without GPG signing:
+        mvn clean install -DskipTests
+
+    To deploy a signed release to Maven Central (OSSRH):
+        export GPG_TTY=$(tty)
+        mvn clean deploy -DskipTests -Pgpg.sign
+
+    Requirements:
+    - GPG key must be available and configured
+    - Your ~/.m2/settings.xml must contain OSSRH credentials for serverId=nexus-releases01
+    -->
 
     <profiles>
         <profile>

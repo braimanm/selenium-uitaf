@@ -81,9 +81,19 @@ public class TestNGBase {
 		return testInfo;
 	}
 
-	public synchronized static void attachDataSet(DataPersistence data, String name) {
-		byte[] attachment =  data.toXML().getBytes();
+	public synchronized static void attachDataSet(DataPersistence data, String name, Boolean resolveAliases) {
+		byte[] attachment;
+		if (resolveAliases) {
+			data.getDataAliases().clear();
+			attachment = TestContext.getGlobalAliases().resolveAliases(data).getBytes();
+		} else {
+			attachment = data.toXML().getBytes();
+		}
 		Allure.getLifecycle().addAttachment(name, "text/xml", "xml", attachment);
+	}
+
+	public synchronized static void attachDataSet(DataPersistence data, String name) {
+		attachDataSet(data, name, false);
 	}
 
     protected void initTest(ITestContext testNgContext) {
