@@ -24,7 +24,8 @@ public class TestContext extends PageComponentContext {
 	}
 
 	public static void init(String contextName) {
-		initContext(contextName, () -> getTestProperties().getDriverProvider().getNewDriverInstance());
+		initContext(contextName, () ->
+				getTestProperties().getDriverProvider().getNewDriverInstance(TestContext.getTestProperties()));
 		String res = getTestProperties().getScreenSize();
 		if (res != null) {
 			String[] resWH = res.toLowerCase().split("x");

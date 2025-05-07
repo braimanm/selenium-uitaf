@@ -13,7 +13,10 @@ Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 
 package com.braimanm.uitaf.support;
 
-import org.openqa.selenium.Platform;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+import io.qameta.allure.internal.shadowed.jackson.core.JsonProcessingException;
+import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -22,21 +25,20 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class DefaultDriverProvider implements DriverProvider {
 
-    private Proxy setupWebDriverProxy() {
+    protected Proxy setupWebDriverProxy() {
         TestProperties prop = TestContext.getTestProperties();
         Proxy proxy = null;
         if (prop.getHttpProxy() != null) {
@@ -52,101 +54,138 @@ public class DefaultDriverProvider implements DriverProvider {
         return proxy;
     }
 
-    private DesiredCapabilities getCapabilities() {
-        TestProperties prop = TestContext.getTestProperties();
-        Platform platform = prop.getBrowserPlatform();
-        if (platform == null) {
-            platform = Platform.ANY;
-        }
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setBrowserName(getBrowserType().getDriverName());
-        capabilities.setVersion(prop.getBrowserVersion());
-        capabilities.setPlatform(platform);
-        capabilities.merge(prop.getExtraCapabilities());
-        return capabilities;
-    }
-
-    private URL getRemoteUrl() {
-        TestProperties prop = TestContext.getTestProperties();
-        URL url;
+    protected URL getRemoteUrl(String urlString) {
         try {
-            url = new URL(prop.getRemoteURL());
+            return new URL(urlString);
         } catch (MalformedURLException e) {
             throw new RuntimeException("webdriver.remote.url property has invalid value!");
         }
-        return url;
+    }
+
+    protected void addScreenSize(TestProperties prop, Object options) {
+        String res = prop.getScreenSize();
+        if (res != null) {
+            res = res.toLowerCase().trim().replace("x", ",");
+            String arg = "--window-size=" + res;
+            if (options instanceof ChromeOptions) {
+                ((ChromeOptions) options).addArguments(arg);
+            } else if (options instanceof FirefoxOptions) {
+                ((FirefoxOptions) options).addArguments(arg);
+            } else if (options instanceof EdgeOptions) {
+                ((EdgeOptions) options).addArguments(arg);
+            }
+        }
+    }
+
+    protected static WebDriver createAppiumDriver(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> config;
+        try {
+            config = mapper.readValue(json, Map.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Extract and remove server URL from config
+        String appiumServerUrl = (String) config.remove("appiumServerUrl");
+        if (appiumServerUrl == null) {
+            throw new IllegalArgumentException("Missing 'appiumServerUrl' in JSON config.");
+        }
+
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        for (Map.Entry<String, Object> entry : config.entrySet()) {
+            capabilities.setCapability(entry.getKey(), entry.getValue());
+        }
+
+        String platformName = (String) config.get("platformName");
+        URL serverUrl;
+        try {
+            serverUrl = new URL(appiumServerUrl);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        if ("iOS".equalsIgnoreCase(platformName)) {
+            return new IOSDriver(serverUrl, capabilities);
+        } else if ("Android".equalsIgnoreCase(platformName)) {
+            return new AndroidDriver(serverUrl, capabilities);
+        } else {
+            throw new IllegalArgumentException("Unsupported platform: " + platformName);
+        }
     }
 
     @Override
-    public WebDriver getNewDriverInstance() {
-        TestProperties prop = TestContext.getTestProperties();
-        DesiredCapabilities desiredCapabilities = getCapabilities();
+    public WebDriver getNewDriverInstance(TestProperties prop) {
+        String browserName = prop.getBrowserType().toLowerCase();
+        String remoteUrl = prop.getRemoteURL();
+        boolean isRemote = remoteUrl != null && !remoteUrl.isBlank();
+
         Proxy proxy = setupWebDriverProxy();
-        if (proxy != null) {
-            desiredCapabilities.setCapability(CapabilityType.PROXY, proxy);
-        }
-        if (prop.getAcceptSSLCerts()) {
-            desiredCapabilities.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, true);
-        }
-        switch (getBrowserType()) {
-            case FIREFOX:
-                FirefoxProfile profile = new FirefoxProfile();
-                profile.setPreference("focusmanager.testmode", true);
-                FirefoxOptions firefoxOptions = new FirefoxOptions(desiredCapabilities);
-                firefoxOptions.setProfile(profile);
-                if (prop.getHeadless()) {
-                    firefoxOptions.addArguments("-headless");
-                }
-                if (prop.getRemoteURL() != null) {
-                    return getRemoteWebDriver(prop.getRemoteURL(), firefoxOptions);
+        boolean acceptSSLCerts = prop.getAcceptSSLCerts();
+        boolean headless = prop.getHeadless();
+
+        switch (prop.getBrowserType().toUpperCase()) {
+            case "FIREFOX":
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                if (proxy != null) firefoxOptions.setProxy(proxy);
+                if (acceptSSLCerts) firefoxOptions.setAcceptInsecureCerts(true);
+                if (headless) firefoxOptions.addArguments("-headless");
+                addScreenSize(prop, firefoxOptions);
+                if (isRemote) {
+                    return new RemoteWebDriver(getRemoteUrl(remoteUrl), firefoxOptions);
                 } else {
                     return new FirefoxDriver(firefoxOptions);
                 }
 
-            case CHROME:
+            case "CHROME":
                 ChromeOptions chromeOptions = new ChromeOptions();
-                chromeOptions.merge(desiredCapabilities);
+                if (proxy != null) chromeOptions.setProxy(proxy);
+                if (acceptSSLCerts) chromeOptions.setAcceptInsecureCerts(true);
                 chromeOptions.addArguments("--disable-notifications");
-                if (prop.getHeadless()) {
+                if (headless) {
                     chromeOptions.addArguments("--headless=new", "--disable-gpu");
-                    String res = prop.getScreenSize();
-                    if (res != null) {
-                        res = res.toLowerCase().trim().replace("x", ",");
-                        chromeOptions.addArguments("--window-size=" + res);
-                    }
                 }
-                if (prop.getRemoteURL() != null) {
-                    return getRemoteWebDriver(prop.getRemoteURL(), chromeOptions);
+                addScreenSize(prop, chromeOptions);
+                if (isRemote) {
+                    return new RemoteWebDriver(getRemoteUrl(remoteUrl), chromeOptions);
                 } else {
                     return new ChromeDriver(chromeOptions);
                 }
 
-            case SAFARI:
-                SafariOptions safariOptions = SafariOptions.fromCapabilities(desiredCapabilities);
-                if (prop.getRemoteURL() != null) {
-                    return getRemoteWebDriver(prop.getRemoteURL(), safariOptions);
+            case "SAFARI":
+                SafariOptions safariOptions = new SafariOptions();
+                if (proxy != null) safariOptions.setProxy(proxy);
+                if (acceptSSLCerts) safariOptions.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, true);
+                if (isRemote) {
+                    return new RemoteWebDriver(getRemoteUrl(remoteUrl), safariOptions);
                 } else {
                     return new SafariDriver(safariOptions);
                 }
 
-            case IE:
-                InternetExplorerOptions internetExplorerOptions = new InternetExplorerOptions(desiredCapabilities);
-                if (prop.getRemoteURL() != null) {
-                    return getRemoteWebDriver(prop.getRemoteURL(), internetExplorerOptions);
-                } else {
-                    return new InternetExplorerDriver(internetExplorerOptions);
-                }
-
-            case EDGE:
+            case "EDGE":
                 EdgeOptions edgeOptions = new EdgeOptions();
-                edgeOptions.merge(desiredCapabilities);
-                if (prop.getRemoteURL() != null) {
-                    return getRemoteWebDriver(prop.getRemoteURL(), edgeOptions);
+                if (proxy != null) edgeOptions.setProxy(proxy);
+                if (acceptSSLCerts) edgeOptions.setAcceptInsecureCerts(true);
+                if (headless) {
+                    edgeOptions.addArguments("--headless=new", "--disable-gpu");
+                }
+                addScreenSize(prop, edgeOptions);
+                if (isRemote) {
+                    return new RemoteWebDriver(getRemoteUrl(remoteUrl), edgeOptions);
                 } else {
                     return new EdgeDriver(edgeOptions);
                 }
 
+            case "IOS":
+            case "ANDROID":
+                return createAppiumDriver(prop.getExtraCapabilities());
+
+            default:
+                throw new IllegalArgumentException("Unsupported browser: " + prop.getBrowserType());
+
         }
-        return null;
+
+
     }
 }
+

@@ -14,9 +14,7 @@ Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 package com.braimanm.uitaf.support;
 
 import io.qameta.allure.model.Parameter;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import ru.qatools.properties.Property;
 import ru.qatools.properties.PropertyLoader;
 import ru.qatools.properties.Resource;
@@ -57,9 +55,8 @@ public class TestProperties {
 	@Use(DriverProviderConverter.class)
 	@Property("driver.provider")
 	private DriverProvider driverProvider = new DefaultDriverProvider();
-	@Use(BrowserTypePropertyConverter.class)
 	@Property("webdriver.browser.type")
-	private WebDriverTypeEnum browserType = WebDriverTypeEnum.FIREFOX;
+	private String browserType = "CHROME";
 	@Property("webdriver.headless")
 	private boolean headless;
 	@Hide
@@ -146,10 +143,10 @@ public class TestProperties {
 	public String getBrowserVersion() {
 		return version;
 	}
-	public WebDriverTypeEnum getBrowserType() {
+	public String getBrowserType() {
 		return browserType;
 	}
-	public void setBrowserType(WebDriverTypeEnum browserType) {
+	public void setBrowserType(String browserType) {
 		this.browserType=browserType;
 	}
 	public int getPageTimeout() {
@@ -222,21 +219,8 @@ public class TestProperties {
 		return params;
 	}
 
-	public Capabilities getExtraCapabilities() {
-		DesiredCapabilities capabilities = new DesiredCapabilities();
-		if (extraCapabilities != null) {
-			String[] params = extraCapabilities.split(",");
-			for (String param : params) {
-				String[] values = param.split("=", 2);
-				String key = values[0].trim();
-				String value = values[1].trim();
-				if (key.contains("securityToken") && System.getenv().containsKey("SEC_TOKEN")) {
-					value = System.getenv("SEC_TOKEN");
-				}
-				capabilities.setCapability(key, value);
-			}
-		}
-		return capabilities;
+	public String getExtraCapabilities() {
+		return extraCapabilities;
 	}
 
 	public void setExtraCapabilities(String capabilities) {
