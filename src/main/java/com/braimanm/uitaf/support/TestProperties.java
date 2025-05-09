@@ -14,10 +14,7 @@ Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 package com.braimanm.uitaf.support;
 
 import io.qameta.allure.model.Parameter;
-import ru.qatools.properties.Property;
-import ru.qatools.properties.PropertyLoader;
-import ru.qatools.properties.Resource;
-import ru.qatools.properties.Use;
+import ru.qatools.properties.*;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -34,12 +31,15 @@ public class TestProperties {
 	private EnvironmentsSetup.Environment testEnvironment;
 	@Hide
 	@Property("report.results")
-	private File resultsFolder = new File("target/results");
+	@DefaultValue("target/results")
+	private File resultsFolder;
 	@Hide
 	@Property("report.folder")
-	private File reportFolder = new File("target/report");
+	@DefaultValue("target/report")
+	private File reportFolder;
 	@Property("report.port")
-	private int reportPort = 8090;
+	@DefaultValue("8090")
+	private int reportPort;
 	@Property("report.show")
 	private boolean showReport;
 	@Property("webdriver.remote.url")
@@ -51,7 +51,8 @@ public class TestProperties {
 	@Property("webdriver.browser.version")
 	private String version;
 	@Property("webdriver.browser.type")
-	private String browserType = "CHROME";
+	@DefaultValue("CHROME")
+	private String browserType;
 	@Property("webdriver.headless")
 	private boolean headless;
 	@Hide
@@ -80,9 +81,11 @@ public class TestProperties {
 	@Property("test.parallel.threads")
 	private Integer threadCount;
 	@Property("test.default.retry")
-	private int testDefaultRetry = 2;
+	@DefaultValue("2")
+	private int testDefaultRetry;
 	@Property("webdriver.install")
-	private boolean installDrivers = false;
+	@DefaultValue("false")
+	private boolean installDrivers;
 	@Hide
 	@Property("report.tms.url")
 	private String tmsUrlPattern;
@@ -92,7 +95,20 @@ public class TestProperties {
 
 	public TestProperties() {
 		populateEnvProp();
-		PropertyLoader.newInstance().populate(this);
+		PropertyLoader loader = PropertyLoader.newInstance();
+		Class<?> current = this.getClass();
+		while (current != null && current != Object.class) {
+			try {
+				if (this.getClass().equals(current)) {
+					loader.populate(this);
+				} else {
+					loader.populate(current.getDeclaredConstructor().newInstance());
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			current = current.getSuperclass();
+		}
 	}
 
 	public void setReportUrlPatterns() {
@@ -108,15 +124,19 @@ public class TestProperties {
 		return testEnvironment;
 	}
 
-	protected void populateEnvProp(){
-		for (Field field : this.getClass().getDeclaredFields()) {
-			if (field.isAnnotationPresent(Property.class)) {
-				String prop = field.getAnnotation(Property.class).value();
-				String value = getEnvValue(prop.replace(".", "_"));
-				if (value!=null) {
-					System.setProperty(prop, value);
+	protected void populateEnvProp() {
+		Class<?> current = this.getClass();
+		while (current != null && current != Object.class) {
+			for (Field field : current.getDeclaredFields()) {
+				if (field.isAnnotationPresent(Property.class)) {
+					String prop = field.getAnnotation(Property.class).value();
+					String value = getEnvValue(prop.replace(".", "_"));
+					if (value != null) {
+						System.setProperty(prop, value);
+					}
 				}
 			}
+			current = current.getSuperclass();
 		}
 	}
 
@@ -193,24 +213,33 @@ public class TestProperties {
 		return str.toString();
 	}
 
-	public List<Parameter> getAsParameters(){
-		List<Parameter> params=new ArrayList<>();
+	public List<Parameter> getAsParameters() {
+		List<Parameter> params = new ArrayList<>();
+
 		if (testEnvironment != null) {
 			params.add(new Parameter().setName("test.env.name").setValue(testEnvironment.getEnvironmentName()));
 			params.add(new Parameter().setName("test.env.url").setValue(testEnvironment.getUrl()));
 		}
-		for (Field field : this.getClass().getDeclaredFields()) {
-			if (field.isAnnotationPresent(Property.class) && ! field.isAnnotationPresent(Hide.class)) {
-				String property= field.getAnnotation(Property.class).value();
-				String value;
-				try {
-					value=field.get(this).toString();
-				} catch (Exception e ) {
-					value="";
+
+		Class<?> current = this.getClass();
+		while (current != null && current != Object.class) {
+			for (Field field : current.getDeclaredFields()) {
+				field.setAccessible(true);
+				if (field.isAnnotationPresent(Property.class) && !field.isAnnotationPresent(Hide.class)) {
+					String property = field.getAnnotation(Property.class).value();
+					try {
+						Object raw = field.get(this);
+						String value = (raw != null) ? raw.toString() : "";
+						params.add(new Parameter().setName(property).setValue(value));
+					} catch (IllegalAccessException e) {
+						// Handle or ignore field access errors
+						params.add(new Parameter().setName(property).setValue(""));
+					}
 				}
-				params.add(new Parameter().setName(property).setValue(value));
 			}
+			current = current.getSuperclass();
 		}
+
 		return params;
 	}
 
