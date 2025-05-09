@@ -42,8 +42,9 @@ public class TestContext extends PageComponentContext {
 		}
 	}
 
-	public static TestProperties getTestProperties() {
-		return props.get();
+	@SuppressWarnings("unchecked")
+	public static <T extends TestProperties> T getTestProperties() {
+		return (T) props.get();
 	}
 
 	public static void init(String contextName) {
