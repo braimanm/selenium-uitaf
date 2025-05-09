@@ -1,23 +1,46 @@
-/*
-Copyright 2010-2024 Michael Braiman braimanm@gmail.com
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-       http://www.apache.org/licenses/LICENSE-2.0
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-
 package com.braimanm.uitaf.support;
 
 import com.braimanm.ui.auto.context.PageComponentContext;
 import org.openqa.selenium.Dimension;
 
 public class TestContext extends PageComponentContext {
-	private static final ThreadLocal<TestProperties> props = ThreadLocal.withInitial(TestProperties::new);
+	private static final UITAFProperties frameworkProps = new UITAFProperties();
+	private static final ThreadLocal<TestProperties> props = ThreadLocal.withInitial(TestContext::loadTestProperties);
+	private static final DriverProvider driverProvider = loadDriverProvider();
+
+	private static TestProperties loadTestProperties() {
+		String className = frameworkProps.getTestPropertiesClass();
+		if (className != null && !className.trim().isEmpty()) {
+			try {
+				Class<?> clazz = Class.forName(className.trim());
+				if (TestProperties.class.isAssignableFrom(clazz)) {
+					return (TestProperties) clazz.getDeclaredConstructor().newInstance();
+				} else {
+					throw new RuntimeException("Class " + className + " does not extend TestProperties");
+				}
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to instantiate test.properties class: " + className, e);
+			}
+		}
+		return new TestProperties();
+	}
+
+	private static DriverProvider loadDriverProvider() {
+		String className = frameworkProps.getDriverProviderClass();
+		if (className == null || className.trim().isEmpty()) {
+			throw new RuntimeException("Missing required property: driver.provider in uitaf.properties");
+		}
+		try {
+			Class<?> clazz = Class.forName(className.trim());
+			if (DriverProvider.class.isAssignableFrom(clazz)) {
+				return (DriverProvider) clazz.getDeclaredConstructor().newInstance();
+			} else {
+				throw new RuntimeException("Class " + className + " does not implement DriverProvider");
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to instantiate driver.provider class: " + className, e);
+		}
+	}
 
 	public static TestProperties getTestProperties() {
 		return props.get();
@@ -25,7 +48,7 @@ public class TestContext extends PageComponentContext {
 
 	public static void init(String contextName) {
 		initContext(contextName, () ->
-				getTestProperties().getDriverProvider().getNewDriverInstance(TestContext.getTestProperties()));
+				driverProvider.getNewDriverInstance(getTestProperties()));
 		String res = getTestProperties().getScreenSize();
 		if (res != null) {
 			String[] resWH = res.toLowerCase().split("x");
@@ -41,5 +64,4 @@ public class TestContext extends PageComponentContext {
 			getContext().setPageLoadTimeOut(getTestProperties().getPageTimeout() * 1000);
 		}
 	}
-
 }

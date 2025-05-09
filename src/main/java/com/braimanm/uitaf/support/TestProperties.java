@@ -14,7 +14,6 @@ Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 package com.braimanm.uitaf.support;
 
 import io.qameta.allure.model.Parameter;
-import org.openqa.selenium.Platform;
 import ru.qatools.properties.Property;
 import ru.qatools.properties.PropertyLoader;
 import ru.qatools.properties.Resource;
@@ -46,15 +45,11 @@ public class TestProperties {
 	@Property("webdriver.remote.url")
 	private String remoteURL;
 	@Hide
-	@Use(BrowserPlatformPropertyConverter.class)
 	@Property("webdriver.browser.platform")
-	private Platform platform;
+	private String platform;
 	@Hide
 	@Property("webdriver.browser.version")
 	private String version;
-	@Use(DriverProviderConverter.class)
-	@Property("driver.provider")
-	private DriverProvider driverProvider = new DefaultDriverProvider();
 	@Property("webdriver.browser.type")
 	private String browserType = "CHROME";
 	@Property("webdriver.headless")
@@ -95,7 +90,7 @@ public class TestProperties {
 	@Property("report.issue.url")
 	private String issueUrlPattern;
 
-	TestProperties() {
+	public TestProperties() {
 		populateEnvProp();
 		PropertyLoader.newInstance().populate(this);
 	}
@@ -113,7 +108,7 @@ public class TestProperties {
 		return testEnvironment;
 	}
 
-	private void populateEnvProp(){
+	protected void populateEnvProp(){
 		for (Field field : this.getClass().getDeclaredFields()) {
 			if (field.isAnnotationPresent(Property.class)) {
 				String prop = field.getAnnotation(Property.class).value();
@@ -125,7 +120,7 @@ public class TestProperties {
 		}
 	}
 
-	private String getEnvValue(String prop) {
+	protected String getEnvValue(String prop) {
 		for (String key : System.getenv().keySet()) {
 			if (prop.equalsIgnoreCase(key)) {
 				return System.getenv(key);
@@ -137,7 +132,7 @@ public class TestProperties {
 	public String getRemoteURL() {
 		return remoteURL;
 	}
-	public Platform getBrowserPlatform() {
+	public String getBrowserPlatform() {
 		return platform;
 	}
 	public String getBrowserVersion() {
@@ -257,9 +252,6 @@ public class TestProperties {
 	}
 	public boolean installDrivers() {
 		return installDrivers;
-	}
-	public DriverProvider getDriverProvider() {
-		return driverProvider;
 	}
 	public boolean getHeadless() {
 		return headless;

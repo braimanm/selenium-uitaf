@@ -93,7 +93,7 @@ public class TestNGBase {
 	}
 
 	public synchronized static void attachDataSet(DataPersistence data, String name) {
-		attachDataSet(data, name, false);
+		attachDataSet(data, name, true);
 	}
 
     protected void initTest(ITestContext testNgContext) {
